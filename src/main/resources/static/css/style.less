@@ -1,57 +1,66 @@
+@dark1: #363636;
+@dark2: #242f40;
+@accent: #cca43b;
+@light1: #e5e5e5;
+@light2: #ffffff;
+
 @font-face {
   font-family: 'Giphurs';
   src: url('fonts/Giphurs/Giphurs-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
 }
+
 /* base styling */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Giphurs', sans-serif;
-  /* Use quotes */
+  font-family: 'Giphurs', sans-serif; /* Use quotes */
 }
-body,
-html {
+
+body, html {
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #363636;
+  background: @dark1;
 }
+
 .tableContainer {
   display: grid;
-  grid-template-areas: "player1 table player3" "player2 player2 player2";
+  grid-template-areas:
+        "player1 table player3"
+        "player2 player2 player2";
   grid-template-rows: 40% 60%;
   grid-template-columns: 20% 60% 20%;
   width: 80vw;
   height: 60vh;
   border: 2px;
 }
+
 .popUpContainer {
-  position: absolute;
-  /* Take the container out of the document flow */
+  position: absolute; /* Take the container out of the document flow */
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  /* Center the container both vertically and horizontally */
+  transform: translate(-50%, -50%); /* Center the container both vertically and horizontally */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 85%;
-  /* Set an appropriate width */
+  width: 85%; /* Set an appropriate width */
   padding: 20px;
-  color: #e5e5e5;
-  border: 10px solid #cca43b;
+  color: @light1;
+  border: 10px solid @accent;
   border-radius: 15px;
-  background-color: #242f40;
+  background-color: @dark2;
 }
+
+
 .button {
-  background-color: #cca43b;
+  background-color: @accent;
   border: none;
-  color: #242f40;
+  color: @dark2;
   padding: 5px 8px;
   text-align: center;
   text-decoration: none;
@@ -60,6 +69,7 @@ html {
   min-height: 30px;
   width: 20%;
 }
+
 #gameModeMenuContainer,
 #onlineMenuContainer,
 #joinGameContainer,
@@ -67,7 +77,8 @@ html {
   visibility: hidden;
 }
 /* debug */
-.contentContainer {
+.contentContainer{
+  //border: 1px solid Red;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -75,20 +86,26 @@ html {
   min-width: 80%;
   padding: 5px 5px;
 }
-.titleContainer {
+
+.titleContainer{
+  //border: 1px solid Cyan;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-width: 80%;
+  align-items: center;  min-width: 80%;
 }
+
+
+
 /* name input */
-#nameInputField {
-  background: #363636;
+
+#nameInputField{
+  background: @dark1;
   border: none;
   width: 60%;
   height: 30%;
   padding: 5px 8px;
 }
+
 /*game table*/
 /* Player 1 - Top Left */
 #onlinePlayer1FieldContainer {
@@ -96,16 +113,18 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #cca43b;
+  border: 2px solid @accent;
 }
+
 /* Table - Top Center */
 #onlineTableFieldContainer {
   grid-area: table;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #cca43b;
+  border: 2px solid @accent;
 }
+
 /* Player 3 - Top Right */
 #onlinePlayer3FieldContainer {
   grid-area: player3;
@@ -114,6 +133,7 @@ html {
   align-items: center;
   border: 2px solid green;
 }
+
 /* Player 2 - Bottom Full Width */
 #onlinePlayer2FieldContainer {
   grid-area: player2;
@@ -124,12 +144,14 @@ html {
   border: 2px solid blue;
   padding: 10px;
 }
+
 /* Info and Controls for Player 2, split horizontally */
 #onlinePlayer2InfoFieldContainer,
 #onlinePlayer2ControlsFieldContainer {
   width: 100%;
   display: flex;
 }
+
 /* Info container on the left (half of bottom container) */
 #onlinePlayer2InfoFieldContainer {
   flex: 1;
@@ -138,6 +160,7 @@ html {
   align-items: center;
   border: 2px solid orange;
 }
+
 /* Controls container on the right (half of bottom container) */
 #onlinePlayer2ControlsFieldContainer {
   flex: 1;
@@ -147,6 +170,7 @@ html {
   align-items: center;
   border: 2px solid purple;
 }
+
 /* Bets Panel within Controls Container */
 #localPlayerBetsPanelContainer {
   width: 100%;
@@ -155,6 +179,7 @@ html {
   align-items: center;
   border: 2px solid cyan;
 }
+
 /* Actions Panel within Controls Container */
 #localPlayerActionsPanelContainer {
   width: 100%;
@@ -163,4 +188,3 @@ html {
   align-items: center;
   border: 2px solid magenta;
 }
-/*# sourceMappingURL=style.css.map */
