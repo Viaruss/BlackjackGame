@@ -17,7 +17,6 @@ public class TableController {
         this.tableService = tableService;
     }
 
-    //TODO: Delete after testing
     @GetMapping(path = "")
     public List<Table> getAllTables(){
         return tableService.getAllTables();

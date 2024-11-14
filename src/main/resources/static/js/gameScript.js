@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const onlineModeButton = document.getElementById('onlineModeButton');
     const newTableButton = document.getElementById('newTableButton');
     const joinTableButton = document.getElementById('joinTableButton');
+    const refreshTableListButton = document.getElementById('refreshTableListButton');
 
     const onlinePlayer1FieldContainer = document.getElementById('onlinePlayer1FieldContainer');
     const onlinePlayer2FieldContainer = document.getElementById('onlinePlayer2FieldContainer');
@@ -66,10 +67,16 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => console.log('Table created'));
     });
 
-    joinTableButton.addEventListener('click', () => {
-        hideElement(onlineMenuContainer);
-        showElement(joinGameContainer);
-        // TODO: Add functionality for joining a table
+    joinTableButton.addEventListener('click', async () => {
+        await getAllTables()
+            .then(() => {
+                hideElement(onlineMenuContainer);
+                showElement(joinGameContainer);
+            })
+    });
+
+    refreshTableListButton.addEventListener('click', async () => {
+        await getAllTables();
     });
 
     async function getPlayerRequest(playerName) {
@@ -166,6 +173,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 console.error('Error: Failed to join table', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error: Network or server issue', error);
+        }
+    }
+
+    async function getAllTables() {
+        try {
+            const response = await fetch('/api/v1/table', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const tables = await response.json();
+                const joinGameTableList = document.getElementById('joinGameTableList');
+                joinGameTableList.innerHTML = ''; // Clear existing list
+
+                tables.forEach((table, index) => {
+                    const tableNumber = index + 1;
+                    const players = table.players.map(player => player.name);
+                    while (players.length < 3) {
+                        players.push('empty');
+                    }
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `table ${tableNumber}, Players: ${players.join(', ')}`;
+
+                    const joinButton = document.createElement('button');
+                    joinButton.textContent = 'Join';
+                    joinButton.addEventListener('click', async () => {
+                        await joinTableRequest(table.id);
+                        hideElement(joinGameContainer);
+                        showElement(onlineTableContainer);
+                    });
+
+                    listItem.appendChild(joinButton);
+                    joinGameTableList.appendChild(listItem);
+                });
+            } else {
+                console.error('Error: Failed to fetch tables', response.statusText);
             }
         } catch (error) {
             console.error('Error: Network or server issue', error);

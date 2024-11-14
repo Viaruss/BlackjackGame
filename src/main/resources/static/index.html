@@ -7,11 +7,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <link rel="icon" href="./favicon.ico">
+    <link rel="icon" href="images/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
 </head>
+
 
 <body>
 <div id="nameInputContainer" class="popUpContainer">
@@ -20,7 +20,7 @@
     </div>
     <div id="nameInputFieldContainer" class="contentContainer">
         <input type="text" id="nameInputField" placeholder="Player Name">
-        <button id="nameInputSubmit" class = "button">Submit</button>
+        <button id="nameInputSubmit" class="button">Submit</button>
     </div>
 </div>
 
@@ -30,16 +30,16 @@
         <h1 id="gameModeMenuTitle" class="title">Chose Game Mode</h1>
     </div>
     <div id="gameModeMenuButtonsContainer" class="contentContainer">
-        <button id="practiceModeButton" class = "button">Practice</button>
-        <button id="learnModeButton" class = "button">Learn</button>
-        <button id="onlineModeButton" class = "button">Online</button>
+        <button id="practiceModeButton" class="button">Practice</button>
+        <button id="learnModeButton" class="button">Learn</button>
+        <button id="onlineModeButton" class="button">Online</button>
     </div>
 </div>
 
 
 <div id="onlineMenuContainer" class="popUpContainer">
-    <button id="newTableButton" class = "button">New Table</button>
-    <button id="joinTableButton" class = "button">Join Table</button>
+    <button id="newTableButton" class="button">New Table</button>
+    <button id="joinTableButton" class="button">Join Table</button>
 </div>
 
 
@@ -51,33 +51,52 @@
         <ul id="joinGameTableList">
             <!--            fetched tables go here-->
         </ul>
+        <button id="refreshTableListButton" class="button">Refresh</button>
     </div>
 </div>
 
 
 <div id="onlineTableContainer" class="tableContainer">
-    <div id="onlinePlayer1FieldContainer">player1</div>
-    <div id="onlineTableFieldContainer">Table</div>
-    <div id="onlinePlayer3FieldContainer">player3</div>
-    <div id="onlinePlayer2FieldContainer">player2
+    <div id="onlinePlayer1FieldContainer">
+        <div id="onlinePlayer1Name">Player 1 Name</div>
+        <div id="onlinePlayer1Balance">Balance: 20</div>
+        <div id="onlinePlayer1Bet">Bet: 100</div>
+    </div>
+    <div id="onlineTableFieldContainer">
+        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
+        <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
+        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
+        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
+    </div>
+    <div id="onlinePlayer3FieldContainer">
+        <div id="onlinePlayer3Name">Player 3 Name</div>
+        <div id="onlinePlayer3Balance">Balance: 20</div>
+        <div id="onlinePlayer3Bet">Bet: 100</div>
+    </div>
+    <div id="onlinePlayer2FieldContainer">
         <div id="onlinePlayer2InfoFieldContainer">
-            <div id="localPlayerInformationContainer">
-                playerInfo
-                <!--            player information go here-->
+            <div id="onlinePlayer2InformationContainer">
+                <div id="onlinePlayer2Balance">Balance: 2000</div>
+                <div id="onlinePlayer2Name">Player Name</div>
+                <div id="onlinePlayer2Bet">Bet: 100</div>
             </div>
         </div>
         <div id="onlinePlayer2ControlsFieldContainer">
-            <div id="localPlayerBetsPanelContainer">
-                betPanel
+            <div id="onlinePlayer2BetsPanelContainer">
                 <!--            player bets controls go here-->
                 <div id="betsControlAmountContainer">
                     Amount: 150
                 </div>
                 <div id="betsControlsCoinContainer">
-
+                    <button id="betsControlsCoin5" class="coinButton coinButton1">5</button>
+                    <button id="betsControlsCoin10" class="coinButton coinButton2">10</button>
+                    <button id="betsControlsCoin25" class="coinButton coinButton3">25</button>
+                    <button id="betsControlsCoin50" class="coinButton coinButton4">50</button>
+                    <button id="betsControlsCoin100" class="coinButton coinButton5">100</button>
+                    <button id="betsControlPlaceButton" class="button">Place Bet</button>
                 </div>
             </div>
-            <div id="localPlayerActionsPanelContainer">
+            <div id="onlinePlayer2ActionsPanelContainer">
                 actionsPanel
                 <!--            player actions go here-->
             </div>

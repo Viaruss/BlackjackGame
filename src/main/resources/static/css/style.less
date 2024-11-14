@@ -3,6 +3,7 @@
 @accent: #cca43b;
 @light1: #e5e5e5;
 @light2: #ffffff;
+@banner: #37302E;
 
 @font-face {
   font-family: 'Giphurs';
@@ -27,18 +28,6 @@ body, html {
   background: @dark1;
 }
 
-.tableContainer {
-  display: grid;
-  grid-template-areas:
-        "player1 table player3"
-        "player2 player2 player2";
-  grid-template-rows: 40% 60%;
-  grid-template-columns: 20% 60% 20%;
-  width: 80vw;
-  height: 60vh;
-  border: 2px;
-}
-
 .popUpContainer {
   position: absolute; /* Take the container out of the document flow */
   top: 50%;
@@ -56,7 +45,6 @@ body, html {
   background-color: @dark2;
 }
 
-
 .button {
   background-color: @accent;
   border: none;
@@ -68,16 +56,25 @@ body, html {
   font-size: 16px;
   min-height: 30px;
   width: 20%;
+  border-radius: 8px;
 }
 
-#gameModeMenuContainer,
-#onlineMenuContainer,
-#joinGameContainer,
-#onlineTableContainer {
-  visibility: hidden;
+/* Hover effect for interactivity (only changes size and shadow) */
+.button:hover,
+.coinButton:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4); /* Enhance shadows on hover */
 }
+
+/* Active state (pressed effect) */
+.button:active,
+.coinButton:active {
+  transform: scale(1); /* Return to original size when clicked */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Reduce shadows */
+}
+
 /* debug */
-.contentContainer{
+.contentContainer {
   //border: 1px solid Red;
   display: flex;
   flex-direction: row;
@@ -87,18 +84,29 @@ body, html {
   padding: 5px 5px;
 }
 
-.titleContainer{
+.titleContainer {
   //border: 1px solid Cyan;
   display: flex;
   flex-direction: column;
-  align-items: center;  min-width: 80%;
+  align-items: center;
+  min-width: 80%;
 }
 
+#gameModeMenuContainer,
+#onlineMenuContainer,
+#joinGameContainer,
+#onlineTableContainer,
+#nameInputContainer /* TODO: Delete */{
+  visibility: hidden;
+}
 
+/*TODO: Delete*/
+#onlineTableContainer {
+  visibility: visible;
+}
 
 /* name input */
-
-#nameInputField{
+#nameInputField {
   background: @dark1;
   border: none;
   width: 60%;
@@ -106,32 +114,119 @@ body, html {
   padding: 5px 8px;
 }
 
-/*game table*/
-/* Player 1 - Top Left */
-#onlinePlayer1FieldContainer {
-  grid-area: player1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid @accent;
+// Kamil Kozioł
+// Bartłomiej Sudoł
+// Norbert Przyjemnski
+// Kuba Martynski
+// Piotr Popławski
+
+#onlineTableContainer {
+  display: grid;
+  grid-template-areas:
+        "player1 table player3"
+        "player2 player2 player2";
+  grid-template-rows: 75% 25%;
+  grid-template-columns: 15% 70% 15%;
+  width: 100vw;
+  height: 100vh;
+  border: 2px;
+  color: @light1;
 }
 
+/*game table*/
 /* Table - Top Center */
 #onlineTableFieldContainer {
   grid-area: table;
-  display: flex;
+  display: grid;
+  grid-template-areas:
+        "player1 croupier player3"
+        "player1 gap player3"
+        "player1 player2 player3";
+  grid-template-rows: 30% 40% 30%;
+  grid-template-columns: 20% 60% 20%;
+  width: 100%;
+  height: 100%;
   justify-content: center;
   align-items: center;
-  border: 2px solid @accent;
+  border: 20px solid @dark2;
+  border-radius: 20px;
+  overflow: hidden;
+  //TODO: Przywrócić tło
+  background-image: url('/static/images/BJMBannerWide.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#croupierCardsField,
+#player1CardsField,
+#player2CardsField,
+#player3CardsField {
+  border: 2px solid orangered;
+  align-items: center;
+}
+
+#croupierCardsField {
+  grid-area: croupier;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#player1CardsField {
+  grid-area: player1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#player2CardsField {
+  grid-area: player2;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#player3CardsField {
+  grid-area: player3;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#onlinePlayer3FieldContainer,
+#onlinePlayer1FieldContainer {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  padding-left: 20px;
+}
+
+#onlinePlayer1Name,
+#onlinePlayer3Name,
+#onlinePlayer1Balance,
+#onlinePlayer3Balance,
+#onlinePlayer1Bet,
+#onlinePlayer3Bet{
+  border-left: 5px solid @accent;
+  padding-left: 10px;
+}
+
+/* Player 1 - Top Left */
+#onlinePlayer1FieldContainer {
+  grid-area: player1;
+  //border: 2px solid darkred;
 }
 
 /* Player 3 - Top Right */
 #onlinePlayer3FieldContainer {
   grid-area: player3;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid green;
+  //border: 2px solid green;
 }
 
 /* Player 2 - Bottom Full Width */
@@ -141,50 +236,185 @@ body, html {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  border: 2px solid blue;
+  padding: 10px;
+  //border: 2px solid blue;
+}
+
+
+#onlinePlayer2InfoFieldContainer {
+  width: 100%;
+}
+
+#onlinePlayer2InformationContainer {
+  display: grid;
+  grid-template-columns: 20% 20% 20%;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: @light2;
+  margin-bottom: 5px;
   padding: 10px;
 }
 
-/* Info and Controls for Player 2, split horizontally */
-#onlinePlayer2InfoFieldContainer,
+#onlinePlayer2Balance,
+#onlinePlayer2Name,
+#onlinePlayer2Bet {
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 5px solid @accent;
+}
+
 #onlinePlayer2ControlsFieldContainer {
   width: 100%;
-  display: flex;
-}
-
-/* Info container on the left (half of bottom container) */
-#onlinePlayer2InfoFieldContainer {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid orange;
-}
-
-/* Controls container on the right (half of bottom container) */
-#onlinePlayer2ControlsFieldContainer {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  border: 2px solid purple;
+  position: relative;
 }
 
 /* Bets Panel within Controls Container */
-#localPlayerBetsPanelContainer {
+#onlinePlayer2BetsPanelContainer {
   width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 2px solid cyan;
+  position: absolute;
+}
+
+#betsControlAmountContainer {
+  width: auto;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: @light2;
+  margin-bottom: 15px;
+}
+
+#betsControlsCoinContainer {
+  display: flex;
+  width: 100%;
+  height: 70%;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 15px;
+}
+
+/* Common Styles for all Buttons */
+.coinButton {
+  width: 70px; /* Diameter of the chip */
+  height: 70px; /* Diameter of the chip */
+  border-radius: 50%; /* Make it circular */
+  border: 2px solid #000; /* Outer border */
+  color: #000; /* Text color */
+  font-weight: bold;
+  font-size: 16px; /* Text size */
+  text-align: center;
+  line-height: 70px; /* Center text vertically */
+  position: relative; /* Enable positioning for pseudo-elements */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add depth */
+  cursor: pointer;
+  background: radial-gradient(circle,@light2 50%, transparent 100%); /* Transparent center for layering */
+  z-index: 1; /* Ensure text remains above pseudo-elements */
+}
+/* Specific Colors for Each Button */
+.coinButton1 {
+  background-color: black; /* Orange */
+}
+.coinButton2 {
+  background-color: red; /* Blue */
+}
+.coinButton3 {
+  background-color: green; /* Green */
+}
+.coinButton4 {
+  background-color: blue; /* Purple */
+}
+.coinButton5 {
+  background-color: darkviolet; /* Gold */
+}
+
+/* Border patterns for each button */
+.coinButton1::before,
+.coinButton2::before,
+.coinButton3::before,
+.coinButton4::before,
+.coinButton5::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  top: -2px; /* Adjust for border alignment */
+  left: -2px;
+  width: calc(100% + 4px); /* Include border size */
+  height: calc(100% + 4px); /* Include border size */
+  background: conic-gradient(
+         @light2 0deg,
+          transparent 15deg,
+         @light2 30deg,
+          transparent 45deg,
+         @light2 60deg,
+          transparent 75deg,
+         @light2 90deg,
+          transparent 105deg,
+         @light2 120deg,
+          transparent 135deg,
+         @light2 150deg,
+          transparent 165deg,
+         @light2 180deg,
+          transparent 195deg,
+         @light2 210deg,
+          transparent 225deg,
+         @light2 240deg,
+          transparent 255deg,
+         @light2 270deg,
+          transparent 285deg,
+         @light2 300deg,
+          transparent 315deg,
+         @light2 330deg,
+          transparent 345deg,
+         @light2 360deg
+  ); /* Alternating pattern */
+  z-index: -1; /* Ensure it's behind the button content */
+}
+
+/* Inner circle for all buttons */
+.coinButton1::after,
+.coinButton2::after,
+.coinButton3::after,
+.coinButton4::after,
+.coinButton5::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  background: inherit; /* Match the main button background color */
+  z-index: -2; /* Ensure it's beneath the gradient pattern */
+}
+
+#betsControlPlaceButton {
+  width: 70px; /* Diameter of the chip */
+  height: 70px; /* Diameter of the chip */
+  font-weight: bold;
+  font-size: 16px; /* Text size */
+  cursor: pointer;
 }
 
 /* Actions Panel within Controls Container */
-#localPlayerActionsPanelContainer {
+/*TODO: Implement*/
+#onlinePlayer2ActionsPanelContainer {
+  visibility: hidden;
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid magenta;
+  position: absolute;
 }
