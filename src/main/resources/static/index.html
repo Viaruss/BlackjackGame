@@ -1,109 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Black Jack Mastermind</title>
-    <script src="https://cdn.jsdelivr.net/npm/less"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <link rel="icon" href="images/favicon.ico">
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-</head>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Black Jack Mastermind</title>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/less"></script>-->
+<!--    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>-->
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>-->
+<!--    <link rel="icon" href="../../../assets/images/favicon.ico">-->
+<!--    <link rel="stylesheet" href="../../../assets/css/style.css">-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">-->
+<!--</head>-->
 
 
-<body>
-<div id="nameInputContainer" class="popUpContainer">
-    <div id="nameInputTitleContainer" class="titleContainer">
-        <h1 id="nameInputTitle" class="title">Input Player Name</h1>
-    </div>
-    <div id="nameInputFieldContainer" class="contentContainer">
-        <input type="text" id="nameInputField" placeholder="Player Name">
-        <button id="nameInputSubmit" class="button">Submit</button>
-    </div>
-</div>
+<!--<body>-->
+<!--<div id="nameInputContainer" class="popUpContainer">-->
+<!--    <div id="nameInputTitleContainer" class="titleContainer">-->
+<!--        <h1 id="nameInputTitle" class="title">Input Player Name</h1>-->
+<!--    </div>-->
+<!--    <div id="nameInputFieldContainer" class="contentContainer">-->
+<!--        <input type="text" id="nameInputField" placeholder="Player Name">-->
+<!--        <button id="nameInputSubmit" class="button">Submit</button>-->
+<!--    </div>-->
+<!--</div>-->
 
 
-<div id="gameModeMenuContainer" class="popUpContainer">
-    <div id="gameModeMenuTitleContainer" class="titleContainer">
-        <h1 id="gameModeMenuTitle" class="title">Chose Game Mode</h1>
-    </div>
-    <div id="gameModeMenuButtonsContainer" class="contentContainer">
-        <button id="practiceModeButton" class="button">Practice</button>
-        <button id="learnModeButton" class="button">Learn</button>
-        <button id="onlineModeButton" class="button">Online</button>
-    </div>
-</div>
+<!--<div id="gameModeMenuContainer" class="popUpContainer">-->
+<!--    <div id="gameModeMenuTitleContainer" class="titleContainer">-->
+<!--        <h1 id="gameModeMenuTitle" class="title">Chose Game Mode</h1>-->
+<!--    </div>-->
+<!--    <div id="gameModeMenuButtonsContainer" class="contentContainer">-->
+<!--        <button id="practiceModeButton" class="button">Practice</button>-->
+<!--        <button id="learnModeButton" class="button">Learn</button>-->
+<!--        <button id="onlineModeButton" class="button">Online</button>-->
+<!--    </div>-->
+<!--</div>-->
 
 
-<div id="onlineMenuContainer" class="popUpContainer">
-    <button id="newTableButton" class="button">New Table</button>
-    <button id="joinTableButton" class="button">Join Table</button>
-</div>
+<!--<div id="onlineMenuContainer" class="popUpContainer">-->
+<!--    <button id="newTableButton" class="button">New Table</button>-->
+<!--    <button id="joinTableButton" class="button">Join Table</button>-->
+<!--</div>-->
 
 
-<div id="joinGameContainer" class="popUpContainer">
-    <div id="joinGameTitleContainer" class="titleContainer">
-        <h1 id="joinGameTitle" class="title">Tables:</h1>
-    </div>
-    <div id="joinGameTableListContainer" class="contentContainer">
-        <ul id="joinGameTableList">
-            <!--            fetched tables go here-->
-        </ul>
-        <button id="refreshTableListButton" class="button">Refresh</button>
-    </div>
-</div>
+<!--<div id="joinGameContainer" class="popUpContainer">-->
+<!--    <div id="joinGameTitleContainer" class="titleContainer">-->
+<!--        <h1 id="joinGameTitle" class="title">Tables:</h1>-->
+<!--    </div>-->
+<!--    <div id="joinGameTableListContainer" class="contentContainer">-->
+<!--        <ul id="joinGameTableList">-->
+<!--            &lt;!&ndash;            fetched tables go here&ndash;&gt;-->
+<!--        </ul>-->
+<!--        <button id="refreshTableListButton" class="button">Refresh</button>-->
+<!--    </div>-->
+<!--</div>-->
 
 
-<div id="onlineTableContainer" class="tableContainer">
-    <div id="onlinePlayer1FieldContainer">
-        <div id="onlinePlayer1Name">Player 1 Name</div>
-        <div id="onlinePlayer1Balance">Balance: 20</div>
-        <div id="onlinePlayer1Bet">Bet: 100</div>
-    </div>
-    <div id="onlineTableFieldContainer">
-        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
-        <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
-        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
-        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
-    </div>
-    <div id="onlinePlayer3FieldContainer">
-        <div id="onlinePlayer3Name">Player 3 Name</div>
-        <div id="onlinePlayer3Balance">Balance: 20</div>
-        <div id="onlinePlayer3Bet">Bet: 100</div>
-    </div>
-    <div id="onlinePlayer2FieldContainer">
-        <div id="onlinePlayer2InfoFieldContainer">
-            <div id="onlinePlayer2InformationContainer">
-                <div id="onlinePlayer2Balance">Balance: 2000</div>
-                <div id="onlinePlayer2Name">Player Name</div>
-                <div id="onlinePlayer2Bet">Bet: 100</div>
-            </div>
-        </div>
-        <div id="onlinePlayer2ControlsFieldContainer">
-            <div id="onlinePlayer2BetsPanelContainer">
-                <!--            player bets controls go here-->
-                <div id="betsControlAmountContainer">
-                    Amount: 150
-                </div>
-                <div id="betsControlsCoinContainer">
-                    <button id="betsControlsCoin5" class="coinButton coinButton1">5</button>
-                    <button id="betsControlsCoin10" class="coinButton coinButton2">10</button>
-                    <button id="betsControlsCoin25" class="coinButton coinButton3">25</button>
-                    <button id="betsControlsCoin50" class="coinButton coinButton4">50</button>
-                    <button id="betsControlsCoin100" class="coinButton coinButton5">100</button>
-                    <button id="betsControlPlaceButton" class="button">Place Bet</button>
-                </div>
-            </div>
-            <div id="onlinePlayer2ActionsPanelContainer">
-                actionsPanel
-                <!--            player actions go here-->
-            </div>
-        </div>
-    </div>
-</div>
+<!--<div id="onlineTableContainer" class="tableContainer">-->
+<!--    <div id="onlinePlayer1FieldContainer">-->
+<!--        <div id="onlinePlayer1Name">Player 1 Name</div>-->
+<!--        <div id="onlinePlayer1Balance">Balance: 20</div>-->
+<!--        <div id="onlinePlayer1Bet">Bet: 100</div>-->
+<!--    </div>-->
+<!--    <div id="onlineTableFieldContainer">-->
+<!--        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>-->
+<!--        <div id="player1CardsField" class="tableCardsField">player1CardsField</div>-->
+<!--        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>-->
+<!--        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>-->
+<!--    </div>-->
+<!--    <div id="onlinePlayer3FieldContainer">-->
+<!--        <div id="onlinePlayer3Name">Player 3 Name</div>-->
+<!--        <div id="onlinePlayer3Balance">Balance: 20</div>-->
+<!--        <div id="onlinePlayer3Bet">Bet: 100</div>-->
+<!--    </div>-->
+<!--    <div id="onlinePlayer2FieldContainer">-->
+<!--        <div id="onlinePlayer2InfoFieldContainer">-->
+<!--            <div id="onlinePlayer2InformationContainer">-->
+<!--                <div id="onlinePlayer2Balance">Balance: 2000</div>-->
+<!--                <div id="onlinePlayer2Name">Player Name</div>-->
+<!--                <div id="onlinePlayer2Bet">Bet: 100</div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div id="onlinePlayer2ControlsFieldContainer">-->
+<!--            <div id="onlinePlayer2BetsPanelContainer">-->
+<!--                &lt;!&ndash;            player bets controls go here&ndash;&gt;-->
+<!--                <div id="betsControlAmountContainer">-->
+<!--                    Amount: 150-->
+<!--                </div>-->
+<!--                <div id="betsControlsCoinContainer">-->
+<!--                    <button id="betsControlsCoin5" class="coinButton coinButton1">5</button>-->
+<!--                    <button id="betsControlsCoin10" class="coinButton coinButton2">10</button>-->
+<!--                    <button id="betsControlsCoin25" class="coinButton coinButton3">25</button>-->
+<!--                    <button id="betsControlsCoin50" class="coinButton coinButton4">50</button>-->
+<!--                    <button id="betsControlsCoin100" class="coinButton coinButton5">100</button>-->
+<!--                    <button id="betsControlPlaceButton" class="button">Place Bet</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div id="onlinePlayer2ActionsPanelContainer">-->
+<!--                actionsPanel-->
+<!--                &lt;!&ndash;            player actions go here&ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
-<script src="js/gameScript.js"></script>
-</body>
-</html>
+<!--<script src="js/gameScript.js"></script>-->
+<!--</body>-->
+<!--</html>-->
