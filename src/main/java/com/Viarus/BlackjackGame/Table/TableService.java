@@ -1,22 +1,24 @@
 package com.Viarus.BlackjackGame.Table;
 
 import com.Viarus.BlackjackGame.Table.Player.Player;
+import com.Viarus.BlackjackGame.Table.Player.PlayerActions;
+import com.Viarus.BlackjackGame.Table.Player.PlayerDAO;
 import com.Viarus.BlackjackGame.Table.Player.PlayerService;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TableService {
     private final TableDAO tableDAO;
     private final PlayerService playerService;
-    private final ApplicationContext context;
+    private final PlayerDAO playerDAO;
 
-    public TableService(TableDAO tableDAO, PlayerService playerService, ApplicationContext context) {
+    public TableService(TableDAO tableDAO, PlayerService playerService, PlayerDAO playerDAO) {
         this.tableDAO = tableDAO;
         this.playerService = playerService;
-        this.context = context;
+        this.playerDAO = playerDAO;
     }
 
     public Table getTable(String tableId) {
@@ -34,14 +36,20 @@ public class TableService {
         return tableDAO.findAll();
     }
 
-    public Table joinTable(String tableId, String playerId) {
+    public Table joinTable(String tableId, String playerId) throws Exception {
         Table table = getTable(tableId);
         Player player = playerService.getPlayerById(playerId);
-
-        table.addPlayer(player);
-
-        tableDAO.save(table);
-        return table;
+        if (!table.players.contains(player) && Objects.equals(player.getCurrentTableId(), null)) {
+            table.addPlayer(player);
+            player.setCurrentTableId(tableId);
+            tableDAO.save(table);
+            playerDAO.save(player);
+        }
+        if (Objects.equals(player.getCurrentTableId(), tableId)) {
+            return table;
+        } else {
+            throw new Exception("Player is already at another table");
+        }
     }
 
     public Table leaveTable(String tableId, String playerId) {
@@ -49,19 +57,28 @@ public class TableService {
         Player player = playerService.getPlayerById(playerId);
 
         table.removePlayer(player);
+        player.setCurrentTableId(null);
 
         tableDAO.save(table);
+        playerDAO.save(player);
+
         return table;
     }
 
-    public Table placeBet(String tableId, String playerId, int amount) {
-        Table table = getTable(tableId);
-        Player player = playerService.placeBet(playerId, amount);
-        table.updatePlayer(player);
+    public Table placeBet(String tableId, String playerId, int amount) throws Exception {
+        if (playerService.getPlayerById(playerId).getCurrentAction() == PlayerActions.BETTING) {
+            Table table = getTable(tableId);
+            Player player = playerService.placeBet(playerId, amount);
+            player.setCurrentAction(PlayerActions.WAITING);
 
-        playerService.save(player);
-        tableDAO.save(table);
-        return table;
+            table.updatePlayer(player);
+
+            playerService.save(player);
+            tableDAO.save(table);
+            return table;
+        }
+        else throw new Exception("This player cannot place bets now");
+
     }
 
     public Table startGame(String tableId) {
@@ -99,16 +116,13 @@ public class TableService {
             boolean playerWon = false;
             int playerValue = player.getHand().value;
             boolean playerBlackJack = (playerValue == 21 && player.getHand().cards.size() == 2);
-
-            if (playerValue > 21 || (croupierValue > playerValue & croupierValue <= 21)) {
-                playerWon = false;
-            } else if (croupierValue > 21 || croupierValue < playerValue) {
+            if ((croupierValue > 21 || croupierValue < playerValue) && croupierValue != 21) {
                 playerWon = true;
             }
 
             if (playerWon) {
                 int playerWinnings;
-                if (playerBlackJack && croupierValue != 21) {
+                if (playerBlackJack) {
                     playerWinnings = player.getBet() * table.getBlackJackMultiplier();
                 } else {
                     playerWinnings = player.getBet() * 2;
@@ -122,7 +136,6 @@ public class TableService {
                 player.addLosings(player.getBet());
                 table.getCroupier().addWinnings(player.getBet());
             }
-
 
             player.setBet(0);
 

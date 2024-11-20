@@ -17,11 +17,9 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    //TODO: Delete After Testing
     @GetMapping()
     public ResponseEntity<Player> getPlayerByName(@RequestParam String name) {
         Player player = playerService.getPlayerByName(name);
-        System.out.printf("Player: %s\n", player);
         if (player == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else return ResponseEntity.ok(player);
     }
@@ -36,7 +34,6 @@ public class PlayerController {
     @PostMapping()
     public ResponseEntity<Player> createNewPlayer(@RequestParam String name) {
         Player player = playerService.createNewPlayer(name);
-        System.out.printf("Player: %s\n", player);
         if (player == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else return ResponseEntity.ok(player);
     }

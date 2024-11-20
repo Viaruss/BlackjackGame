@@ -17,7 +17,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Giphurs', sans-serif; /* Use quotes */
+  font-family: 'Giphurs', sans-serif;
 }
 
 body, html {
@@ -26,6 +26,7 @@ body, html {
   justify-content: center;
   align-items: center;
   background: @dark1;
+  overflow: hidden;
 }
 
 .popUpContainer {
@@ -64,21 +65,20 @@ body, html {
 .button:hover,
 .coinButton:hover,
 .joinGameTableListElement:hover {
-  transform: scale(1.1); /* Slightly enlarge on hover */
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4); /* Enhance shadows on hover */
+  transform: scale(1.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Active state (pressed effect) */
 .button:active,
 .coinButton:active,
 .joinGameTableListElement:active  {
-  transform: scale(1); /* Return to original size when clicked */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Reduce shadows */
+  transform: scale(1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* debug */
 .contentContainer {
-  //border: 1px solid Red;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -88,7 +88,6 @@ body, html {
 }
 
 .titleContainer {
-  //border: 1px solid Cyan;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,6 +111,7 @@ body, html {
 
   /* name input */
 #nameInputField {
+  color: @light2;
   background: @dark1;
   border: none;
   width: 60%;
@@ -119,11 +119,32 @@ body, html {
   padding: 5px 8px;
 }
 
+#joinGameTableListContainer {
+  display: flex;
+  width: 90%;
+}
+
 #joinGameTableList {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-right: 5px;
+  width: 70%;
+}
+
+#joinGameTableListPlaceholder {
+  width: 100%;
+  align-items: flex-start;
+  margin-bottom: 5px;
+  text-align: left;
+  background-color: @accent;
+  color: @dark2;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  min-height: 30px;
+  border: none;
+  border-radius: 8px;
 }
 
 #joinGameTableListElement {
@@ -132,6 +153,19 @@ body, html {
   margin-bottom: 5px;
   text-align: left;
 }
+
+#joinGameTableActions {
+  display: flex;
+  width: 30%;
+}
+
+#refreshTableListButton,
+#newTableButton {
+  margin-bottom: 5px;
+  margin-left: 5px;
+  width: 100%;
+}
+
 #onlineTableContainer {
   display: grid;
   grid-template-areas:
@@ -319,36 +353,37 @@ body, html {
 
 /* Common Styles for all Buttons */
 .coinButton {
-  width: 70px; /* Diameter of the chip */
-  height: 70px; /* Diameter of the chip */
-  border-radius: 50%; /* Make it circular */
-  border: 2px solid #000; /* Outer border */
-  color: #000; /* Text color */
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 2px solid #000;
+  color: #000;
   font-weight: bold;
-  font-size: 16px; /* Text size */
+  font-size: 16px;
   text-align: center;
-  line-height: 70px; /* Center text vertically */
-  position: relative; /* Enable positioning for pseudo-elements */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add depth */
+  line-height: 70px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  background: radial-gradient(circle,@light2 50%, transparent 100%); /* Transparent center for layering */
-  z-index: 1; /* Ensure text remains above pseudo-elements */
+  background: radial-gradient(circle,@light2 50%, transparent 100%);
+  z-index: 1;
 }
+
 /* Specific Colors for Each Button */
 .coinButton1 {
-  background-color: black; /* Orange */
+  background-color: black;
 }
 .coinButton2 {
-  background-color: red; /* Blue */
+  background-color: red;
 }
 .coinButton3 {
-  background-color: green; /* Green */
+  background-color: green;
 }
 .coinButton4 {
-  background-color: blue; /* Purple */
+  background-color: blue;
 }
 .coinButton5 {
-  background-color: darkviolet; /* Gold */
+  background-color: darkviolet;
 }
 
 /* Border patterns for each button */
@@ -360,10 +395,10 @@ body, html {
   content: '';
   position: absolute;
   border-radius: 50%;
-  top: -2px; /* Adjust for border alignment */
+  top: -2px;
   left: -2px;
-  width: calc(100% + 4px); /* Include border size */
-  height: calc(100% + 4px); /* Include border size */
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
   background: conic-gradient(
          @light2 0deg,
           transparent 15deg,
@@ -390,8 +425,8 @@ body, html {
          @light2 330deg,
           transparent 345deg,
          @light2 360deg
-  ); /* Alternating pattern */
-  z-index: -1; /* Ensure it's behind the button content */
+  );
+  z-index: -1;
 }
 
 /* Inner circle for all buttons */
@@ -407,8 +442,8 @@ body, html {
   left: 10%;
   width: 80%;
   height: 80%;
-  background: inherit; /* Match the main button background color */
-  z-index: -2; /* Ensure it's beneath the gradient pattern */
+  background: inherit;
+  z-index: -2;
 }
 
 #betsControlPlaceButton {
@@ -422,7 +457,6 @@ body, html {
 /* Actions Panel within Controls Container */
 /*TODO: Implement*/
 #onlinePlayer2ActionsPanelContainer {
-  visibility: hidden;
   width: 100%;
   height: 100%;
   display: flex;

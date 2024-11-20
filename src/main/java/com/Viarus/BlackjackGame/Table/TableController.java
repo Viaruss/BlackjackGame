@@ -18,59 +18,71 @@ public class TableController {
     }
 
     @GetMapping(path = "")
-    public List<Table> getAllTables(){
+    public List<Table> getAllTables() {
         return tableService.getAllTables();
     }
 
     @GetMapping(path = "/{tableId}")
-    public Table getTable(@PathVariable String tableId){
+    public Table getTable(@PathVariable String tableId) {
         return tableService.getTable(tableId);
     }
 
     @PostMapping()
-    public Table createNewTable(){
+    public Table createNewTable() {
         return tableService.createNewTable();
     }
 
     @PutMapping(path = "join/{tableId}")
-    public Table joinTable(@PathVariable String tableId,
-                           @RequestParam String playerId){
-        return tableService.joinTable(tableId, playerId);
+    public ResponseEntity<Object> joinTable(@PathVariable String tableId,
+                                             @RequestParam String playerId) {
+        try {
+            Table table = tableService.joinTable(tableId, playerId);
+            return ResponseEntity.ok(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
     }
 
     @PutMapping(path = "/leave/{tableId}")
     public Table leaveTable(@PathVariable String tableId,
-                            @RequestParam String playerId){
+                            @RequestParam String playerId) {
         return tableService.leaveTable(tableId, playerId);
     }
 
     @PutMapping(path = "/bet/{tableId}")
-    public Table placeBet(@PathVariable String tableId,
+    public ResponseEntity<Object>  placeBet(@PathVariable String tableId,
                           @RequestParam String playerId,
-                          @RequestParam int amount){
-        return tableService.placeBet(tableId, playerId, amount);
+                          @RequestParam int amount) {
+        try {
+            Table table = tableService.placeBet(tableId, playerId, amount);
+            return ResponseEntity.ok(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
     }
 
     @PostMapping("/startGame/{tableId}")
-    public Table startGame(@PathVariable String tableId){
+    public Table startGame(@PathVariable String tableId) {
         return tableService.startGame(tableId);
     }
 
     @PutMapping("/croupierTurn/{tableId}")
-    public ResponseEntity<Table> croupierMove(@PathVariable String tableId){
+    public ResponseEntity<Table> croupierMove(@PathVariable String tableId) {
         Table table = tableService.croupierMove(tableId);
 
-        if(table == null) {
+        if (table == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(table);
     }
 
     @GetMapping("roundResult/{tableId}")
-    public ResponseEntity<Table> roundResult(@PathVariable String tableId){
+    public ResponseEntity<Table> roundResult(@PathVariable String tableId) {
         Table table = tableService.roundResult(tableId);
 
-        if(table == null){
+        if (table == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(table);

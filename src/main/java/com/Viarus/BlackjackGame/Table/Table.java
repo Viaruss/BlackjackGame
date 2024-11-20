@@ -43,21 +43,25 @@ public class Table {
 
     public Table() {
         this.players = new ArrayList<>();
+        for(int i = 0; i < this.maxPlayers; i++) players.add(null);
         this.croupier = new Croupier();
         this.croupierTurn = false;
-        this.betsPlaceable = true;
+        this.betsPlaceable = false;
         this.roundInProgress = false;
         this.cardsInPlay = new Deck(decksCount);
     }
 
-    public void addPlayer(Player player) {
-        if (players.size() < maxPlayers) {
-            this.players.add(player);
+    public void addPlayer(Player player) throws Exception {
+        if (this.players.contains(null)) {
+            this.players.set(this.players.indexOf(null), player);
+        } else {
+            throw new Exception("Table is already full");
         }
     }
 
     public void removePlayer(Player player) {
-        this.players.remove(player);
+        int playerIndex = this.players.indexOf(player);
+        this.players.set(playerIndex, null);
     }
 
     @Override
@@ -102,7 +106,6 @@ public class Table {
             }
         }
     }
-
     //TODO: any buttons that correspond to invalid decisions should be greyed out on the front end
     // (maybe add availableDecision field to player?)
     public Table processPlayerDecision(Player player, PlayerDecisions decision) {

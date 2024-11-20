@@ -21,72 +21,76 @@
       </div>
     </div>
 
-    <div id="onlineMenuContainer" class="popUpContainer">
-      <button id="newTableButton" class="button" @click="createTable">New Table</button>
-      <button id="joinTableButton" class="button" @click="handleJoinTable">Join Table</button>
-    </div>
-
     <div id="joinGameContainer" class="popUpContainer">
       <div id="joinGameTitleContainer" class="titleContainer">
         <h1 id="joinGameTitle" class="title">Tables:</h1>
       </div>
       <div id="joinGameTableListContainer" class="contentContainer">
         <ul id="joinGameTableList">
-          <li id="joinGameTableListElement" class="joinGameTableListElement" @click="joinTable(table.id)" v-for="(table, index) in tables" :key="table.id">
-            Table {{ index+1 }}: (Players: {{ table.players.map(p => p.name).join(', ') }})
+          <li id="joinGameTableListPlaceholder" v-if="tables.length === 0">
+            No tables available. Please create a new table.
+          </li>
+          <li id="joinGameTableListElement" class="joinGameTableListElement" @click="joinTable(table.id)"
+              v-for="(table, index) in tables" :key="table.id">
+            Table {{ index + 1 }}: (Players: {{
+              table.players ? table.players.filter(p => p)
+                  .map(p => p.name).join(', ') || 'No players yet' : 'No players yet'
+            }})
           </li>
         </ul>
-        <button id="refreshTableListButton" class="button" @click="fetchTables">Refresh</button>
+        <div id="joinGameTableActions">
+          <button id="refreshTableListButton" class="button" @click="fetchTables">Refresh</button>
+          <button id="newTableButton" class="button" @click="createTable">New Table</button>
+        </div>
       </div>
     </div>
 
     <div id="onlineTableContainer" class="tableContainer">-->
-          <div id="onlinePlayer1FieldContainer">
-              <div id="onlinePlayer1Name">Player 1 Name</div>
-              <div id="onlinePlayer1Balance">Balance: 20</div>
-              <div id="onlinePlayer1Bet">Bet: 100</div>
-          </div>
-          <div id="onlineTableFieldContainer">
-              <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
-              <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
-              <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
-              <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
-          </div>
-          <div id="onlinePlayer3FieldContainer">
-              <div id="onlinePlayer3Name">Player 3 Name</div>
-              <div id="onlinePlayer3Balance">Balance: 20</div>
-              <div id="onlinePlayer3Bet">Bet: 100</div>
-          </div>
-          <div id="onlinePlayer2FieldContainer">
-              <div id="onlinePlayer2InfoFieldContainer">
-                  <div id="onlinePlayer2InformationContainer">
-                      <div id="onlinePlayer2Balance">Balance: 2000</div>
-                      <div id="onlinePlayer2Name">Player Name</div>
-                      <div id="onlinePlayer2Bet">Bet: 100</div>
-                  </div>
-              </div>
-              <div id="onlinePlayer2ControlsFieldContainer">
-                  <div id="onlinePlayer2BetsPanelContainer">
-                      <!--            player bets controls go here-->
-                      <div id="betsControlAmountContainer">
-                          Amount: 150
-                      </div>
-                      <div id="betsControlsCoinContainer">
-                          <button id="betsControlsCoin5" class="coinButton coinButton1">5</button>
-                          <button id="betsControlsCoin10" class="coinButton coinButton2">10</button>
-                          <button id="betsControlsCoin25" class="coinButton coinButton3">25</button>
-                          <button id="betsControlsCoin50" class="coinButton coinButton4">50</button>
-                          <button id="betsControlsCoin100" class="coinButton coinButton5">100</button>
-                          <button id="betsControlPlaceButton" class="button">Place Bet</button>
-                      </div>
-                  </div>
-                  <div id="onlinePlayer2ActionsPanelContainer">
-                      actionsPanel
-                      <!--            player actions go here-->
-                  </div>
-              </div>
-          </div>
+      <div id="onlinePlayer1FieldContainer">
+        <div id="onlinePlayer1Name">Empty</div>
+        <div id="onlinePlayer1Balance">Balance:</div>
+        <div id="onlinePlayer1Bet">Bet:</div>
       </div>
+      <div id="onlineTableFieldContainer">
+        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
+        <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
+        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
+        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
+      </div>
+      <div id="onlinePlayer3FieldContainer">
+        <div id="onlinePlayer3Name">Empty</div>
+        <div id="onlinePlayer3Balance">Balance:</div>
+        <div id="onlinePlayer3Bet">Bet:</div>
+      </div>
+      <div id="onlinePlayer2FieldContainer">
+        <div id="onlinePlayer2InfoFieldContainer">
+          <div id="onlinePlayer2InformationContainer">
+            <div id="onlinePlayer2Balance"></div>
+            <div id="onlinePlayer2Name"></div>
+            <div id="onlinePlayer2Bet"></div>
+          </div>
+        </div>
+        <div id="onlinePlayer2ControlsFieldContainer">
+          <div id="onlinePlayer2BetsPanelContainer" v-if="this.player && this.player.currentAction === 'BETTING'">
+            <div id="betsControlAmountContainer">
+              Amount: {{ this.playerBetCount }}
+            </div>
+            <div id="betsControlsCoinContainer">
+              <button id="betsControlsCoin5" class="coinButton coinButton1" @click="this.playerBetCount += 5">5</button>
+              <button id="betsControlsCoin10" class="coinButton coinButton2" @click="this.playerBetCount += 10">10</button>
+              <button id="betsControlsCoin25" class="coinButton coinButton3" @click="this.playerBetCount += 25">25</button>
+              <button id="betsControlsCoin50" class="coinButton coinButton4" @click="this.playerBetCount += 50">50</button>
+              <button id="betsControlsCoin100" class="coinButton coinButton5" @click="this.playerBetCount += 100">100</button>
+              <button id="betsControlPlaceButton" class="button" @click="placeBet">Place Bet</button>
+              <button id="betsControlPlaceButton" class="button" @click="this.playerBetCount = 0">Reset</button>
+            </div>
+          </div>
+          <div id="onlinePlayer2ActionsPanelContainer"   v-if="this.player && this.player.currentAction === 'DECIDING'">
+
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -97,13 +101,17 @@ export default {
     window.vm = this; // Assigns the Vue instance to `vm`
     console.log('Vue instance mounted and accessible via window.vm');
   },
+
   data() {
     return {
       playerName: '',
-      tables: [],
       player: null,
+      tables: [],
+      table: null,
+      playerBetCount: 0,
     };
   },
+
   methods: {
     handleNameSubmit() {
       if (this.playerName) {
@@ -115,6 +123,7 @@ export default {
         alert('Please enter a name');
       }
     },
+
     async getPlayer(name) {
       try {
         const response = await fetch(`/api/v1/player?name=${name}`);
@@ -128,48 +137,81 @@ export default {
         console.error('Error fetching/creating player:', error);
       }
     },
+
     selectPracticeMode() {
       document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
     },
+
     selectLearnMode() {
       document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
     },
-    selectOnlineMode() {
+
+    async selectOnlineMode() {
+      await this.fetchTables();
       document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
-      document.getElementById('onlineMenuContainer').style.visibility = 'visible';
+      document.getElementById('joinGameContainer').style.visibility = 'visible';
     },
+
     async createTable() {
       try {
         const response = await fetch('/api/v1/table', {method: 'POST'});
         if (response.ok) {
           const table = await response.json();
           await this.joinTable(table.id);
-          document.getElementById('onlineMenuContainer').style.visibility = 'hidden';
+          document.getElementById('joinGameContainer').style.visibility = 'hidden';
           document.getElementById('onlineTableContainer').style.visibility = 'visible';
         }
       } catch (error) {
         console.error('Error creating table:', error);
       }
     },
-    async handleJoinTable() {
-      await this.fetchTables();
-      document.getElementById('onlineMenuContainer').style.visibility = 'hidden';
-      document.getElementById('joinGameContainer').style.visibility = 'visible';
-    },
+
     async joinTable(tableId) {
       try {
         console.log("trying to join a table")
         const response = await fetch(`/api/v1/table/join/${tableId}?playerId=${this.player.id}`, {method: 'PUT'});
         if (response.ok) {
-          const table = await response.json();
-          console.log('Joined table:', table);
+          this.table = await response.json();
+          console.log('Joined table:', this.table);
+          this.updatePlayers();
           document.getElementById('joinGameContainer').style.visibility = 'hidden';
           document.getElementById('onlineTableContainer').style.visibility = 'visible';
+        } else {
+          const info = await response.text();
+          alert(info)
+          console.error('Error joining table: ', info);
         }
       } catch (error) {
-        console.error('Error joining table:', error);
+        console.error('Error joining table: ', error.toString());
       }
     },
+
+    updatePlayers() {
+      if (!this.table || !this.player) {
+        console.error('Table or player is not defined.');
+        return;
+      }
+
+      const otherPlayers = (this.table.players || []).filter(p => p && p.id !== this.player.id);
+
+      document.getElementById("onlinePlayer2Name").innerText = this.player.name || 'Unknown';
+      document.getElementById("onlinePlayer2Balance").innerText = `Balance: ${this.player.balance || 0}`;
+      document.getElementById("onlinePlayer2Bet").innerText = `Bet: ${this.player.bet || 0}`;
+
+      const seatMapping = [
+        {name: "onlinePlayer1Name", balance: "onlinePlayer1Balance", bet: "onlinePlayer1Bet"},
+        {name: "onlinePlayer3Name", balance: "onlinePlayer3Balance", bet: "onlinePlayer3Bet"},
+      ];
+
+      seatMapping.forEach((seat, index) => {
+        const player = otherPlayers[index] || {};
+
+        document.getElementById(seat.name).innerText = player.name || 'Empty';
+        document.getElementById(seat.balance).innerText = `Balance: ${player.balance || 0}`;
+        document.getElementById(seat.bet).innerText = `Bet: ${player.bet || 0}`;
+      });
+    },
+
     async fetchTables() {
       try {
         const response = await fetch('/api/v1/table');
@@ -180,10 +222,36 @@ export default {
         console.error('Error fetching tables:', error);
       }
     },
+
+    async placeBet() {
+      try {
+        const response = await fetch(`/api/v1/table/bet/${this.table.id}?playerId=${this.player.id}&amount=${this.playerBetCount}`, {method: 'PUT'});
+        if (response.ok) {
+          this.table = await response.json();
+          this.playerBetCount = 0;
+          await this.getPlayer(this.player.name);
+          this.updatePlayers();
+        } else {
+          const info = await response.text();
+          alert(info);
+          console.error(info);
+        }
+      } catch (error) {
+        console.error('Error fetching tables:', error);
+      }
+    },
   },
 };
+
+
+//TODO: DODANE KARTY, OGARNĄĆ ICH WYŚWIETLANIE I PRZEANALIZOWAĆ JESZCZE RAZ LOGIKĘ ROZGRYWKI -
+  //TODO: W RAZIE POTRZEB TRZEBA BĘDZIE OD NOWA UTWORZYĆ ALGORYTM I ODNOWIC ENDPOINTY
+
+
+
 </script>
 
 <style scoped>
 /* Scoped styles can be added here */
 </style>
+
