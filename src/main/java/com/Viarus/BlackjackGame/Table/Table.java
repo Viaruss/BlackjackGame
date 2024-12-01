@@ -12,6 +12,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Document
 @Getter
@@ -43,7 +45,7 @@ public class Table {
 
     public Table() {
         this.players = new ArrayList<>();
-        for(int i = 0; i < this.maxPlayers; i++) players.add(null);
+        for (int i = 0; i < this.maxPlayers; i++) players.add(null);
         this.croupier = new Croupier();
         this.croupierTurn = false;
         this.betsPlaceable = false;
@@ -78,14 +80,14 @@ public class Table {
 
     public Table startGame() {
         betsPlaceable = false;
-
-        for (Player player : players) {
+        List<Player> currentPlayers = players.stream().filter(Objects::nonNull).toList();
+        for (Player player : currentPlayers) {
             player.setHand(new Hand());
         }
         croupier.setHand(new Hand());
 
         for (int i = 0; i < 2; i++) {
-            for (Player player : players) {
+            for (Player player : currentPlayers) {
                 player.getHand().addCard(cardsInPlay.dealCard());
                 player.setCanDouble(true);
             }
@@ -106,6 +108,7 @@ public class Table {
             }
         }
     }
+
     //TODO: any buttons that correspond to invalid decisions should be greyed out on the front end
     // (maybe add availableDecision field to player?)
     public Table processPlayerDecision(Player player, PlayerDecisions decision) {
@@ -144,8 +147,8 @@ public class Table {
     }
 
     public void croupierMove() {
-        if(croupierTurn){
-            while(croupier.getHand().value <= croupier.getMaxHitValue()){
+        if (croupierTurn) {
+            while (croupier.getHand().value <= croupier.getMaxHitValue()) {
                 croupier.getHand().addCard(cardsInPlay.dealCard());
             }
         }

@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <!-- This is the entry point for your Vue app -->
     <GameComponent />
   </div>
 </template>

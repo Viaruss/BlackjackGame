@@ -86,7 +86,7 @@ public class TableService {
         table = table.startGame();
 
         for (Player player : table.players) {
-            playerService.save(player);
+            if (player != null) playerService.save(player);
         }
 
         tableDAO.save(table);

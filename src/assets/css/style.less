@@ -204,44 +204,49 @@ body, html {
   background-repeat: no-repeat;
 }
 
-#croupierCardsField,
-#player1CardsField,
-#player2CardsField,
-#player3CardsField {
-  border: 2px solid orangered;
-  align-items: center;
-}
-
 #croupierCardsField {
   grid-area: croupier;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  flex-direction: row;
 }
 
 #player1CardsField {
   grid-area: player1;
-  display: flex;
+  flex-direction: column;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  align-items: center;
 }
 
 #player2CardsField {
   grid-area: player2;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  flex-direction: row;
 }
 
 #player3CardsField {
   grid-area: player3;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Card {
+  display: inline-block;
+  width: 80px;
+  height: 120px;
+  background-color: white;
+  border: 1px solid #000;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 70px;
+  font-weight: bold;
+}
+
+.tableCardsField {
+  position: relative;
   display: flex;
   justify-content: center;
-  width: 100%;
+  align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 #onlinePlayer3FieldContainer,
@@ -263,19 +268,43 @@ body, html {
   padding-left: 10px;
 }
 
-/* Player 1 - Top Left */
+#croupierCardsField .Card,
+#player2CardsField .Card {
+  left: calc(50% - 40px);
+  top: 0;
+  margin-left: -40px;
+}
+
+#player1CardsField .Card {
+  transform: rotate(90deg);
+  transform-origin: center;
+  margin-top: -80px;
+}
+
+#player3CardsField .Card {
+  transform: rotate(-90deg); /* Rotate -90 degrees for Player 3 */
+  transform-origin: center;
+  margin-top: -80px;
+}
+
+#croupierCardsField .Card:first-child,
+#player2CardsField .Card:first-child {
+  margin-left: 0;
+}
+
+#player1CardsField .Card:first-child,
+#player3CardsField .Card:first-child {
+  margin-top: 0;
+}
+
 #onlinePlayer1FieldContainer {
   grid-area: player1;
-  //border: 2px solid darkred;
 }
 
-/* Player 3 - Top Right */
 #onlinePlayer3FieldContainer {
   grid-area: player3;
-  //border: 2px solid green;
 }
 
-/* Player 2 - Bottom Full Width */
 #onlinePlayer2FieldContainer {
   grid-area: player2;
   display: flex;
@@ -283,9 +312,7 @@ body, html {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  //border: 2px solid blue;
 }
-
 
 #onlinePlayer2InfoFieldContainer {
   width: 100%;

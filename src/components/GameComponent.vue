@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div id="onlineTableContainer" class="tableContainer">-->
+    <div id="onlineTableContainer" class="tableContainer">
       <div id="onlinePlayer1FieldContainer">
         <div id="onlinePlayer1Name">Empty</div>
         <div id="onlinePlayer1Balance">Balance:</div>
@@ -77,15 +77,19 @@
             </div>
             <div id="betsControlsCoinContainer">
               <button id="betsControlsCoin5" class="coinButton coinButton1" @click="this.playerBetCount += 5">5</button>
-              <button id="betsControlsCoin10" class="coinButton coinButton2" @click="this.playerBetCount += 10">10</button>
-              <button id="betsControlsCoin25" class="coinButton coinButton3" @click="this.playerBetCount += 25">25</button>
-              <button id="betsControlsCoin50" class="coinButton coinButton4" @click="this.playerBetCount += 50">50</button>
-              <button id="betsControlsCoin100" class="coinButton coinButton5" @click="this.playerBetCount += 100">100</button>
+              <button id="betsControlsCoin10" class="coinButton coinButton2" @click="this.playerBetCount += 10">10
+              </button>
+              <button id="betsControlsCoin25" class="coinButton coinButton3" @click="this.playerBetCount += 25">25
+              </button>
+              <button id="betsControlsCoin50" class="coinButton coinButton4" @click="this.playerBetCount += 50">50
+              </button>
+              <button id="betsControlsCoin100" class="coinButton coinButton5" @click="this.playerBetCount += 100">100
+              </button>
               <button id="betsControlPlaceButton" class="button" @click="placeBet">Place Bet</button>
               <button id="betsControlPlaceButton" class="button" @click="this.playerBetCount = 0">Reset</button>
             </div>
           </div>
-          <div id="onlinePlayer2ActionsPanelContainer"   v-if="this.player && this.player.currentAction === 'DECIDING'">
+          <div id="onlinePlayer2ActionsPanelContainer" v-if="this.player && this.player.currentAction === 'DECIDING'">
 
           </div>
         </div>
@@ -186,6 +190,47 @@ export default {
       }
     },
 
+    renderPlayerCards(player, containerId) {
+      const container = document.getElementById(containerId);
+
+      if (container) container.innerHTML = "";
+
+      if (player && player.hand && player.hand.cards) {
+        player.hand.cards.forEach((card, index) => {
+          const cardImg = this.createCardElement(card, index);
+          container.appendChild(cardImg);
+        });
+      }
+    },
+
+    createCardElement(card, index) {
+      const cardImg = document.createElement("img");
+      cardImg.className = "Card";
+      cardImg.src = require(`@/assets/images/cards/${card.rank}${card.suit}.svg`);
+      cardImg.alt = `${card.rank}${card.suit}`;
+      cardImg.style.setProperty("--index", index);
+      return cardImg;
+    },
+
+    renderAllCards() {
+      const croupierContainer = document.getElementById("croupierCardsField");
+      if (croupierContainer) {
+        croupierContainer.innerHTML = "";
+        if (this.table && this.table.croupier && this.table.croupier.hand.cards) {
+          this.table.croupier.hand.cards.forEach((card, index) => {
+            const cardImg = this.createCardElement(card, index);
+            croupierContainer.appendChild(cardImg);
+          });
+        }
+      }
+
+      const otherPlayers = (this.table.players || []).filter(p => p && p.id !== this.player.id);
+
+      this.renderPlayerCards(otherPlayers[0], "player1CardsField");
+      this.renderPlayerCards(this.player, "player2CardsField");
+      this.renderPlayerCards(otherPlayers[1], "player3CardsField");
+    },
+
     updatePlayers() {
       if (!this.table || !this.player) {
         console.error('Table or player is not defined.');
@@ -210,6 +255,7 @@ export default {
         document.getElementById(seat.balance).innerText = `Balance: ${player.balance || 0}`;
         document.getElementById(seat.bet).innerText = `Bet: ${player.bet || 0}`;
       });
+      this.renderAllCards();
     },
 
     async fetchTables() {
@@ -242,13 +288,6 @@ export default {
     },
   },
 };
-
-
-//TODO: DODANE KARTY, OGARNĄĆ ICH WYŚWIETLANIE I PRZEANALIZOWAĆ JESZCZE RAZ LOGIKĘ ROZGRYWKI -
-  //TODO: W RAZIE POTRZEB TRZEBA BĘDZIE OD NOWA UTWORZYĆ ALGORYTM I ODNOWIC ENDPOINTY
-
-
-
 </script>
 
 <style scoped>
