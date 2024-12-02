@@ -3,6 +3,7 @@ package com.Viarus.BlackjackGame.Table;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.List;
 public class TableController {
 
     private final TableService tableService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public TableController(TableService tableService) {
+    public TableController(TableService tableService, SimpMessagingTemplate simpMessagingTemplate) {
         this.tableService = tableService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @GetMapping(path = "")
@@ -37,6 +40,7 @@ public class TableController {
                                              @RequestParam String playerId) {
         try {
             Table table = tableService.joinTable(tableId, playerId);
+            simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
             return ResponseEntity.ok(table);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -56,6 +60,7 @@ public class TableController {
                           @RequestParam int amount) {
         try {
             Table table = tableService.placeBet(tableId, playerId, amount);
+            simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
             return ResponseEntity.ok(table);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -65,7 +70,9 @@ public class TableController {
 
     @PostMapping("/startGame/{tableId}")
     public Table startGame(@PathVariable String tableId) {
-        return tableService.startGame(tableId);
+        Table table = tableService.startGame(tableId);
+        simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
+        return table;
     }
 
     @PutMapping("/croupierTurn/{tableId}")
@@ -75,6 +82,7 @@ public class TableController {
         if (table == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
         return ResponseEntity.ok(table);
     }
 

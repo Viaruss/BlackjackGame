@@ -99,6 +99,9 @@
 </template>
 
 <script>
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
+
 export default {
   //TODO: Delete after debugging
   mounted() {
@@ -113,6 +116,7 @@ export default {
       tables: [],
       table: null,
       playerBetCount: 0,
+      stompClient: null,
     };
   },
 
@@ -176,8 +180,9 @@ export default {
         const response = await fetch(`/api/v1/table/join/${tableId}?playerId=${this.player.id}`, {method: 'PUT'});
         if (response.ok) {
           this.table = await response.json();
+          this.connectToSocket(this.table.id)
           console.log('Joined table:', this.table);
-          this.updatePlayers();
+          this.updateTable();
           document.getElementById('joinGameContainer').style.visibility = 'hidden';
           document.getElementById('onlineTableContainer').style.visibility = 'visible';
         } else {
@@ -188,6 +193,29 @@ export default {
       } catch (error) {
         console.error('Error joining table: ', error.toString());
       }
+    },
+
+    connectToSocket(tableId) {
+      const socket = new SockJS("http://localhost:8080/api/v1/table/connections");
+
+      this.stompClient = new Client({
+        webSocketFactory: () => socket,
+        debug: (str) => console.log(str),
+        reconnectDelay: 5000,
+        heartbeatIncoming: 2000,
+        heartbeatOutgoing: 2000,
+      });
+
+      this.stompClient.onConnect = () => {
+        console.log("Connected to WebSocket");
+
+        this.stompClient.subscribe(`/topic/table/${tableId}`, (response) => {
+          this.table = JSON.parse(response.body);
+          this.updateTable();
+        });
+      };
+
+      this.stompClient.activate();
     },
 
     renderPlayerCards(player, containerId) {
@@ -231,12 +259,12 @@ export default {
       this.renderPlayerCards(otherPlayers[1], "player3CardsField");
     },
 
-    updatePlayers() {
+    updateTable() {
       if (!this.table || !this.player) {
         console.error('Table or player is not defined.');
         return;
       }
-
+      this.player = this.table.players.find(p => p.id === this.player.id) || this.player;
       const otherPlayers = (this.table.players || []).filter(p => p && p.id !== this.player.id);
 
       document.getElementById("onlinePlayer2Name").innerText = this.player.name || 'Unknown';
@@ -276,7 +304,7 @@ export default {
           this.table = await response.json();
           this.playerBetCount = 0;
           await this.getPlayer(this.player.name);
-          this.updatePlayers();
+          this.updateTable();
         } else {
           const info = await response.text();
           alert(info);

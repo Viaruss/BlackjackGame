@@ -4,17 +4,21 @@ import com.Viarus.BlackjackGame.Table.Table;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "api/v1/player")
 public class PlayerController {
     private final PlayerService playerService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public PlayerController(
             @Lazy //to resolve circular dependency
-            PlayerService playerService) {
+            PlayerService playerService,
+            SimpMessagingTemplate simpMessagingTemplate) {
         this.playerService = playerService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @GetMapping()
@@ -48,6 +52,7 @@ public class PlayerController {
         if (table == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
         return ResponseEntity.ok(table);
     }
 
