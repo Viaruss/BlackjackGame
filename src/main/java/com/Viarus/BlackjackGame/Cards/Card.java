@@ -1,13 +1,18 @@
 package com.Viarus.BlackjackGame.Cards;
 
 import com.sun.jdi.InternalException;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
+@Getter
+@Setter
 public class Card {
     public String suit;
     public String rank;
     public int value;
+    public boolean isHidden = false;
 
     public Card(String suit, String rank) {
         this.suit = suit;
@@ -71,5 +76,10 @@ public class Card {
 
     public boolean isAce() {
         return this.rank.equals("A");
+    }
+
+    public Card hide() {
+        this.isHidden = true;
+        return this;
     }
 }

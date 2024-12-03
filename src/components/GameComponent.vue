@@ -90,8 +90,15 @@
             </div>
           </div>
           <div id="onlinePlayer2ActionsPanelContainer" v-if="this.player && this.player.currentAction === 'DECIDING'">
-
+            <button
+                v-for="decision in this.player.availableDecisions"
+                :key="decision"
+                class="button"
+                @click="makeMove(decision)">
+              {{ decision }}
+            </button>
           </div>
+
         </div>
       </div>
     </div>
@@ -100,13 +107,21 @@
 
 <script>
 import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
+import {Client} from '@stomp/stompjs';
 
 export default {
-  //TODO: Delete after debugging
+
   mounted() {
-    window.vm = this; // Assigns the Vue instance to `vm`
+    //TODO: Delete vm after debugging
+    window.vm = this;
     console.log('Vue instance mounted and accessible via window.vm');
+
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
+    this.disconnectFromSocket()
   },
 
   data() {
@@ -121,6 +136,13 @@ export default {
   },
 
   methods: {
+    async handleBeforeUnload(event) {
+      await this.disconnectFromSocket();
+
+      event.preventDefault();
+      event.returnValue = "";
+    },
+
     handleNameSubmit() {
       if (this.playerName) {
         this.getPlayer(this.playerName).then(() => {
@@ -218,6 +240,16 @@ export default {
       this.stompClient.activate();
     },
 
+    async disconnectFromSocket() {
+      await this.leaveTable();
+
+      if (this.stompClient) {
+        console.log("Disconnecting from WebSocket...");
+        this.stompClient.deactivate();
+        this.stompClient = null;
+      }
+    },
+
     renderPlayerCards(player, containerId) {
       const container = document.getElementById(containerId);
 
@@ -286,6 +318,38 @@ export default {
       this.renderAllCards();
     },
 
+    async leaveTable() {
+      if (!this.table || !this.player) {
+        console.warn("Cannot leave table: Table or player is not defined.");
+        return;
+      }
+
+      const endpointUrl = `/api/v1/table/leave/${this.table.id}`;
+      const queryParams = `?playerId=${this.player.id}`;
+
+      try {
+        const response = await fetch(endpointUrl + queryParams, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const updatedTable = await response.json();
+          console.log("Successfully left the table:", updatedTable);
+        } else if (response.status === 400) {
+          const errorMessage = await response.text();
+          console.error("Failed to leave table:", errorMessage);
+          alert(`Failed to leave table: ${errorMessage}`);
+        } else {
+          console.error("Unexpected error when leaving table:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error while leaving table:", error);
+      }
+    },
+
     async fetchTables() {
       try {
         const response = await fetch('/api/v1/table');
@@ -299,12 +363,12 @@ export default {
 
     async placeBet() {
       try {
+        console.log("Placing bet " + this.playerBetCount)
         const response = await fetch(`/api/v1/table/bet/${this.table.id}?playerId=${this.player.id}&amount=${this.playerBetCount}`, {method: 'PUT'});
         if (response.ok) {
           this.table = await response.json();
+          console.log(this.table);
           this.playerBetCount = 0;
-          await this.getPlayer(this.player.name);
-          this.updateTable();
         } else {
           const info = await response.text();
           alert(info);
@@ -314,11 +378,38 @@ export default {
         console.error('Error fetching tables:', error);
       }
     },
+
+    async makeMove(decision) {
+      if (!this.table || !this.player) {
+        console.error("Table or player is not defined.");
+        return;
+      }
+
+      const endpointUrl = `/api/v1/player/${this.table.id}/makeMove`;
+      const queryParams = `?playerId=${this.player.id}&playerDecision=${decision}`;
+
+      try {
+        const response = await fetch(endpointUrl + queryParams, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          console.error(`Failed to make move '${decision}':`, errorMessage);
+          alert(`Failed to make move: ${errorMessage}`);
+        }
+      } catch (error) {
+        console.error(`Error while making move '${decision}':`, error);
+      }
+    },
+
   },
 };
 </script>
 
 <style scoped>
-/* Scoped styles can be added here */
 </style>
 

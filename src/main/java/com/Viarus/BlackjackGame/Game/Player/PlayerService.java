@@ -1,7 +1,7 @@
-package com.Viarus.BlackjackGame.Table.Player;
+package com.Viarus.BlackjackGame.Game.Player;
 
-import com.Viarus.BlackjackGame.Table.Table;
-import com.Viarus.BlackjackGame.Table.TableService;
+import com.Viarus.BlackjackGame.Game.Table.Table;
+import com.Viarus.BlackjackGame.Game.Table.TableService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +10,7 @@ public class PlayerService {
     PlayerDAO playerDAO;
     TableService tableService;
     public PlayerService(PlayerDAO playerDAO,
-                         @Lazy //to resolve circular dependency
-                         TableService tableService) {
+                         @Lazy TableService tableService) {
         this.playerDAO = playerDAO;
         this.tableService = tableService;
     }
@@ -29,6 +28,7 @@ public class PlayerService {
     public Player placeBet(String playerId, int amount) {
         Player player = getPlayerById(playerId);
         player.placeBet(amount);
+        playerDAO.save(player);
         return player;
     }
 
@@ -36,10 +36,10 @@ public class PlayerService {
         playerDAO.save(player);
     }
 
-    public Table makeMove(String tableId, String playerId, String playerDecision) {
+    public Table makeMove(String tableId, String playerId, String playerDecision) throws Exception {
         Table table = tableService.getTable(tableId);
         if(table == null) {
-            return null;
+            throw new Exception("Table not found");
         }
         Player player = table.getPlayers()
                 .stream()
@@ -49,18 +49,10 @@ public class PlayerService {
                 .orElse(null);
 
         if (player == null) {
-            return null;
+            throw new Exception("Player not found");
         }
 
-        table = table.processPlayerDecision(player,
-                PlayerDecisions.valueOf(playerDecision.toUpperCase())
-        );
-
-        if (table == null) {
-            //this will be usefull to give a feedback to frontend, when we return null
-            // the response Entity will return 4xx status, and we know that the move was not made
-            return null;
-        }
+        table = tableService.processPlayerDecision(player, table, PlayerDecisions.valueOf(playerDecision.toUpperCase()));
 
         save(player);
         tableService.save(table);

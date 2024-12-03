@@ -1,5 +1,8 @@
-package com.Viarus.BlackjackGame.Table;
+package com.Viarus.BlackjackGame.Game;
 
+import com.Viarus.BlackjackGame.Game.Table.Table;
+import com.Viarus.BlackjackGame.Game.Table.TableController;
+import com.Viarus.BlackjackGame.Game.Table.TableService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

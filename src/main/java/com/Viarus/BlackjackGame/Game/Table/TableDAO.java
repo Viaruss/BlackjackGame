@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Table;
+package com.Viarus.BlackjackGame.Game.Table;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

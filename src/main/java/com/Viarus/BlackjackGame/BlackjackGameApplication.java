@@ -1,9 +1,6 @@
 package com.Viarus.BlackjackGame;
 
-import com.Viarus.BlackjackGame.Table.Player.Player;
-import com.Viarus.BlackjackGame.Table.Table;
-import com.Viarus.BlackjackGame.Table.TableController;
-import com.Viarus.BlackjackGame.Table.TableDAO;
+import com.Viarus.BlackjackGame.Game.Table.TableDAO;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

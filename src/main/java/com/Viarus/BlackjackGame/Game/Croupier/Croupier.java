@@ -1,6 +1,7 @@
-package com.Viarus.BlackjackGame.Table.Croupier;
+package com.Viarus.BlackjackGame.Game.Croupier;
 
 
+import com.Viarus.BlackjackGame.Cards.Card;
 import com.Viarus.BlackjackGame.Cards.Hand;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,5 +42,11 @@ public class Croupier {
         return "Croupier{" +
                 "cards=" + hand +
                 '}';
+    }
+
+    public void showCards() {
+        for (Card card : hand.cards) {
+            card.setHidden(false);
+        }
     }
 }

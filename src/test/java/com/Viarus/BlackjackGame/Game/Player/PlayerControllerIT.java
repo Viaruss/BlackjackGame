@@ -1,6 +1,6 @@
-package com.Viarus.BlackjackGame.Table.Player;
+package com.Viarus.BlackjackGame.Game.Player;
 
-import com.Viarus.BlackjackGame.Table.Table;
+import com.Viarus.BlackjackGame.Game.Table.Table;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

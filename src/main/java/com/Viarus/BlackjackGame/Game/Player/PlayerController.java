@@ -1,6 +1,6 @@
-package com.Viarus.BlackjackGame.Table.Player;
+package com.Viarus.BlackjackGame.Game.Player;
 
-import com.Viarus.BlackjackGame.Table.Table;
+import com.Viarus.BlackjackGame.Game.Table.Table;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ public class PlayerController {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     public PlayerController(
-            @Lazy //to resolve circular dependency
+            @Lazy
             PlayerService playerService,
             SimpMessagingTemplate simpMessagingTemplate) {
         this.playerService = playerService;
@@ -43,17 +43,16 @@ public class PlayerController {
     }
 
     @PutMapping(path = "/{tableId}/makeMove")
-    public ResponseEntity<Table> playerMove(@PathVariable String tableId,
-                                            @RequestParam String playerId,
-                                            @RequestParam String playerDecision) {
-
-        Table table = playerService.makeMove(tableId, playerId, playerDecision);
-
-        if (table == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<Object> playerMove(@PathVariable String tableId,
+                                             @RequestParam String playerId,
+                                             @RequestParam String playerDecision) {
+        try {
+            Table table = playerService.makeMove(tableId, playerId, playerDecision);
+            simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
+            return ResponseEntity.ok(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
-        simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
-        return ResponseEntity.ok(table);
     }
-
 }

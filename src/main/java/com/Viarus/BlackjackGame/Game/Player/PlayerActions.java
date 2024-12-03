@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Table.Player;
+package com.Viarus.BlackjackGame.Game.Player;
 
 public enum PlayerActions {
     WAITING,

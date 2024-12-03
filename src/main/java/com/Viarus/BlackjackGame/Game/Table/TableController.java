@@ -1,7 +1,6 @@
-package com.Viarus.BlackjackGame.Table;
+package com.Viarus.BlackjackGame.Game.Table;
 
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,8 @@ public class TableController {
     private final TableService tableService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public TableController(TableService tableService, SimpMessagingTemplate simpMessagingTemplate) {
+    public TableController(TableService tableService,
+                           SimpMessagingTemplate simpMessagingTemplate) {
         this.tableService = tableService;
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
@@ -37,7 +37,7 @@ public class TableController {
 
     @PutMapping(path = "join/{tableId}")
     public ResponseEntity<Object> joinTable(@PathVariable String tableId,
-                                             @RequestParam String playerId) {
+                                            @RequestParam String playerId) {
         try {
             Table table = tableService.joinTable(tableId, playerId);
             simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
@@ -49,15 +49,22 @@ public class TableController {
     }
 
     @PutMapping(path = "/leave/{tableId}")
-    public Table leaveTable(@PathVariable String tableId,
-                            @RequestParam String playerId) {
-        return tableService.leaveTable(tableId, playerId);
+    public ResponseEntity<Object> leaveTable(@PathVariable String tableId,
+                                             @RequestParam String playerId) {
+        try {
+            Table table = tableService.leaveTable(tableId, playerId);
+            simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
+            return ResponseEntity.ok(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
     }
 
     @PutMapping(path = "/bet/{tableId}")
-    public ResponseEntity<Object>  placeBet(@PathVariable String tableId,
-                          @RequestParam String playerId,
-                          @RequestParam int amount) {
+    public ResponseEntity<Object> placeBet(@PathVariable String tableId,
+                                           @RequestParam String playerId,
+                                           @RequestParam int amount) {
         try {
             Table table = tableService.placeBet(tableId, playerId, amount);
             simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
@@ -68,24 +75,19 @@ public class TableController {
         }
     }
 
+/*    TODO: Might be useless, should be automatically called by a scheduler
     @PostMapping("/startGame/{tableId}")
-    public Table startGame(@PathVariable String tableId) {
-        Table table = tableService.startGame(tableId);
-        simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
-        return table;
-    }
-
-    @PutMapping("/croupierTurn/{tableId}")
-    public ResponseEntity<Table> croupierMove(@PathVariable String tableId) {
-        Table table = tableService.croupierMove(tableId);
-
-        if (table == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<Object> startGame(@PathVariable String tableId) {
+        try {
+            Table table = tableService.startGame(tableId);
+            simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
+            return ResponseEntity.ok(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
-        simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
-        return ResponseEntity.ok(table);
-    }
-
+    }*/
+/*  TODO: Might be useless, should be automatically called by a scheduler
     @GetMapping("roundResult/{tableId}")
     public ResponseEntity<Table> roundResult(@PathVariable String tableId) {
         Table table = tableService.roundResult(tableId);
@@ -94,6 +96,5 @@ public class TableController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(table);
-    }
-
+    }*/
 }
