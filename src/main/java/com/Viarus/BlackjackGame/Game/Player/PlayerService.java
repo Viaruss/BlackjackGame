@@ -51,6 +51,9 @@ public class PlayerService {
         if (player == null) {
             throw new Exception("Player not found");
         }
+        if (!player.isPlaying) {
+            throw new Exception("Player is not playing in this round");
+        }
 
         table = tableService.processPlayerDecision(player, table, PlayerDecisions.valueOf(playerDecision.toUpperCase()));
 

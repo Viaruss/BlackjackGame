@@ -28,6 +28,7 @@ public class Player {
     List<PlayerDecisions> availableDecisions;
     Hand hand;
     int bet;
+    boolean isPlaying;
 
     public Player(String name, int balance) {
         this.currentTableId = null;
@@ -39,6 +40,7 @@ public class Player {
         availableDecisions = List.of();
         this.hand = new Hand();
         this.bet = 0;
+        this.isPlaying = false;
     }
 
     public void placeBet(int amount) {
@@ -87,12 +89,23 @@ public class Player {
 
     public void evaluatePossibleDecisions() {
         availableDecisions.clear();
-        if (hand.value == 21) {
-            availableDecisions = List.of(PlayerDecisions.STAND);
-        } else if (hand.cards.size() == 2 && balance >= bet) {
-            availableDecisions = List.of(PlayerDecisions.HIT, PlayerDecisions.STAND, PlayerDecisions.DOUBLE);
-        } else if (hand.value < 21) {
-            availableDecisions = List.of(PlayerDecisions.HIT, PlayerDecisions.STAND);
+        if (isPlaying) {
+            if (hand.value == 21) {
+                availableDecisions = List.of(PlayerDecisions.STAND);
+            } else if (hand.cards.size() == 2 && balance >= bet) {
+                availableDecisions = List.of(PlayerDecisions.HIT, PlayerDecisions.STAND, PlayerDecisions.DOUBLE);
+            } else if (hand.value < 21) {
+                availableDecisions = List.of(PlayerDecisions.HIT, PlayerDecisions.STAND);
+            }
         }
+
+    }
+
+    public void leaveTable() {
+        this.setCurrentTableId(null);
+        this.setBet(0);
+        this.hand = new Hand();
+        this.currentAction = PlayerActions.WAITING;
+        this.isPlaying = false;
     }
 }

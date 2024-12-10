@@ -266,8 +266,13 @@ export default {
     createCardElement(card, index) {
       const cardImg = document.createElement("img");
       cardImg.className = "Card";
-      cardImg.src = require(`@/assets/images/cards/${card.rank}${card.suit}.svg`);
-      cardImg.alt = `${card.rank}${card.suit}`;
+      if(card.isHidden) {
+        cardImg.src = require(`@/assets/images/cards/Rev.png`);
+        cardImg.alt = `$Hidden`;
+      } else {
+        cardImg.src = require(`@/assets/images/cards/${card.rank}${card.suit}.svg`);
+        cardImg.alt = `${card.rank}${card.suit}`;
+      }
       cardImg.style.setProperty("--index", index);
       return cardImg;
     },

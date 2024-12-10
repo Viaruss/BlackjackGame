@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+import static com.Viarus.BlackjackGame.Game.Table.GameState.*;
+
 @Service
 public class TableService {
     private final TableDAO tableDAO;
@@ -50,6 +52,7 @@ public class TableService {
         Table table = getTable(tableId);
         Player player = playerService.getPlayerById(playerId);
         if (!table.players.contains(player) && Objects.equals(player.getCurrentTableId(), null)) {
+            player.setCurrentAction(table.getGameState() == BETTING ? PlayerActions.BETTING : PlayerActions.WAITING);
             table.addPlayer(player);
             player.setCurrentTableId(tableId);
             tableDAO.save(table);
@@ -57,7 +60,7 @@ public class TableService {
         }
         if (Objects.equals(player.getCurrentTableId(), tableId)) {
             if (table.getPlayers().stream().filter(Objects::nonNull).count() == 1) {
-                gameStateManager.scheduleStateChange(tableId, GameState.BETTING, gameTimingSettings.initialWaiting);
+                gameStateManager.scheduleStateChange(tableId, BETTING, gameTimingSettings.initialWaiting);
             }
             return table;
         } else {
@@ -70,7 +73,7 @@ public class TableService {
         Player player = playerService.getPlayerById(playerId);
 
         table.removePlayer(player);
-        player.setCurrentTableId(null);
+        player.leaveTable();
 
         tableDAO.save(table);
         playerDAO.save(player);
@@ -81,6 +84,9 @@ public class TableService {
     public Table placeBet(String tableId, String playerId, int amount) throws Exception {
         if (playerService.getPlayerById(playerId).getCurrentAction() == PlayerActions.BETTING) {
             Table table = getTable(tableId);
+            if(table.getGameState() != BETTING) {
+                throw new Exception("This table is not in betting state");
+            }
             Player player = playerService.placeBet(playerId, amount);
             player.setCurrentAction(PlayerActions.WAITING);
 
@@ -105,52 +111,72 @@ public class TableService {
     }
 
     private Table prepareGame(Table table) {
-        table.setGameState(GameState.WAITING_FOR_PLAYERS);
+        table.setGameState(WAITING_FOR_PLAYERS);
         clearCards(table);
         gameStateManager.notifyClients(table.getId());
-        gameStateManager.scheduleStateChange(table.getId(), GameState.BETTING, gameTimingSettings.initialWaiting);
+        gameStateManager.scheduleStateChange(table.getId(), BETTING, gameTimingSettings.initialWaiting);
         return table;
     }
 
     public Table startBetting(Table table) {
-        if (table.getGameState() == GameState.WAITING_FOR_PLAYERS) {
-            table.setGameState(GameState.BETTING);
+        if (table.getGameState() == WAITING_FOR_PLAYERS) {
+            table.setGameState(BETTING);
             List<Player> currentPlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
             for (Player player : currentPlayers) {
                 player.setCurrentAction(PlayerActions.BETTING);
                 table.updatePlayer(player);
                 playerService.save(player);
             }
-            gameStateManager.scheduleStateChange(table.getId(), GameState.PLAYING, gameTimingSettings.betting);
+            gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingSettings.betting);
         }
         return table;
     }
 
     public Table startGame(Table table) {
-        if (table.getGameState() != GameState.BETTING) {
+        if (table.getGameState() != BETTING) {
             return table;
-        }else if (!table.getPlayers().stream().filter(Objects::nonNull).anyMatch(player -> player.getBet() > 0)) {
+        } else if (table.getPlayers().stream().filter(Objects::nonNull).noneMatch(player -> player.getBet() > 0)) {
             System.out.println("No bets placed");
-            gameStateManager.scheduleStateChange(table.getId(), GameState.PLAYING, gameTimingSettings.betting);
+            gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingSettings.betting);
             return table;
         }
-        table.setGameState(GameState.PLAYING);
-        //clearCards(table); TODO: Check if this is necessary
+        table.setGameState(PLAYING);
+        clearCards(table);
 
-        List<Player> currentPlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
+        List<Player> currentPlayers = table.getPlayers()
+                .stream()
+                .filter(Objects::nonNull)
+                .toList();
+
         table.getCroupier().getHand().addCard(table.getCardsInPlay().dealCard().hide());
         table.getCroupier().getHand().addCard(table.getCardsInPlay().dealCard());
 
         for (Player player : currentPlayers) {
+            player.setPlaying(false);
+            if (player.getBet() == 0) {
+                player.setCurrentAction(PlayerActions.WAITING);
+                continue;
+            }
+            player.setPlaying(true);
             for (int i = 0; i < 2; i++) {
                 player.getHand().addCard(table.getCardsInPlay().dealCard());
             }
         }
-        table.setTurnNumber(0);
+        List<Player> availablePlayers = currentPlayers
+                .stream()
+                .filter(Player::isPlaying)
+                .toList();
 
-        List<Player> availablePlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
+        table.setTurnNumber(
+                table.getPlayers()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .toList()
+                        .indexOf(availablePlayers.get(0))
+        );
+
         availablePlayers.get(0).setCurrentAction(PlayerActions.DECIDING);
-        for (Player player : availablePlayers) {
+        for (Player player : currentPlayers) {
             player.evaluatePossibleDecisions();
             table.updatePlayer(player);
             playerService.save(player);
@@ -159,7 +185,7 @@ public class TableService {
         return table;
     }
 
-    private void clearCards(Table table){
+    private void clearCards(Table table) {
         table.getCroupier().setHand(new Hand());
         for (Player player : table.getPlayers().stream().filter(Objects::nonNull).toList()) {
             player.setHand(new Hand());
@@ -167,7 +193,7 @@ public class TableService {
     }
 
     public Table croupierTurn(Table table) {
-        if (table.getGameState() != GameState.PLAYING) {
+        if (table.getGameState() != PLAYING) {
             return null;
         }
         table.setGameState(GameState.CROUPIER_TURN);
@@ -182,33 +208,36 @@ public class TableService {
     }
 
     public Table processPlayerDecision(Player player, Table table, PlayerDecisions decision) throws Exception {
-        if (table.players.indexOf(player) != table.getTurnNumber() || player.getHand().isOver || table.getGameState() != GameState.PLAYING) {
+        if (table.players.indexOf(player) != table.getTurnNumber() ||
+                player.getHand().isOver ||
+                table.getGameState() != PLAYING) {
             throw new Exception("This player is not allowed to make a move now");
-        }
-        if (!player.getAvailableDecisions().contains(decision)) {
-            throw new Exception("Player decision is invalid");
-        }
-        switch (decision) {
-            case HIT -> {
-                player.getHand().addCard(table.getCardsInPlay().dealCard());
-                if (player.getHand().isOver) {
+        } else {
+            if (!player.getAvailableDecisions().contains(decision)) {
+                throw new Exception("Player decision is invalid");
+            }
+            switch (decision) {
+                case HIT -> {
+                    player.getHand().addCard(table.getCardsInPlay().dealCard());
+                    if (player.getHand().isOver) {
+                        player.setCurrentAction(PlayerActions.WAITING);
+                        nextTurn(table);
+                    }
+                }
+                case STAND -> {
+                    player.setCurrentAction(PlayerActions.WAITING);
+                    nextTurn(table);
+                }
+                case DOUBLE -> {
+                    player.placeBet(player.getBet());
+                    player.getHand().addCard(table.getCardsInPlay().dealCard());
                     player.setCurrentAction(PlayerActions.WAITING);
                     nextTurn(table);
                 }
             }
-            case STAND -> {
-                player.setCurrentAction(PlayerActions.WAITING);
-                nextTurn(table);
-            }
-            case DOUBLE -> {
-                player.placeBet(player.getBet());
-                player.getHand().addCard(table.getCardsInPlay().dealCard());
-                player.setCurrentAction(PlayerActions.WAITING);
-                nextTurn(table);
-            }
+            player.evaluatePossibleDecisions();
+            table.updatePlayer(player);
         }
-        player.evaluatePossibleDecisions();
-        table.updatePlayer(player);
         gameStateManager.notifyClients(table.getId());
 
         return table;
@@ -216,9 +245,14 @@ public class TableService {
 
     private void nextTurn(Table table) {
         table.setTurnNumber(table.getTurnNumber() + 1);
-        List<Player> availablePlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
+        List<Player> availablePlayers = table.getPlayers()
+                .stream()
+                .filter(Objects::nonNull)
+                .toList();
         if (table.getTurnNumber() == availablePlayers.size()) {
             gameStateManager.scheduleStateChange(table.getId(), GameState.CROUPIER_TURN, gameTimingSettings.croupierDelay);
+        } else if (!availablePlayers.get(table.getTurnNumber()).isPlaying()) {
+            nextTurn(table);
         } else {
             Player player = availablePlayers.get(table.getTurnNumber());
             player.setCurrentAction(PlayerActions.DECIDING);
@@ -266,7 +300,7 @@ public class TableService {
         }
         //TODO: add something to directly notify clients about the round result for them
         gameStateManager.notifyClients(table.getId());
-        gameStateManager.scheduleStateChange(table.getId(), GameState.WAITING_FOR_PLAYERS, gameTimingSettings.postGameWaiting);
+        gameStateManager.scheduleStateChange(table.getId(), WAITING_FOR_PLAYERS, gameTimingSettings.postGameWaiting);
         tableDAO.save(table);
         return table;
     }
