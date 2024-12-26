@@ -72,8 +72,14 @@ public class TableService {
         Table table = getTable(tableId);
         Player player = playerService.getPlayerById(playerId);
 
+        gameStateManager.cancelScheduledTask();
         table.removePlayer(player);
         player.leaveTable();
+
+        if(table.players.stream().filter(Objects::nonNull).toList().isEmpty()) {
+            table.getCroupier().setHand(new Hand());
+            table.setGameState(WAITING_FOR_PLAYERS);
+        }
 
         tableDAO.save(table);
         playerDAO.save(player);
@@ -91,10 +97,24 @@ public class TableService {
             player.setCurrentAction(PlayerActions.WAITING);
 
             table.updatePlayer(player);
-
+            checkBettingStatus(table);
             tableDAO.save(table);
             return table;
         } else throw new Exception("This player cannot place bets now");
+    }
+
+    private void checkBettingStatus(Table table) {
+        List<Player> currentPlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
+        int betCount = 0;
+        for (Player player : currentPlayers) {
+            betCount += player.getBet() == 0 ? 0 : 1;
+        }
+        if (betCount == 1) {
+            gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingSettings.betting);
+        } else if (betCount == currentPlayers.size()){
+            gameStateManager.cancelScheduledTask();
+            gameStateManager.scheduleStateChange(table.getId(), PLAYING, 0);
+        }
     }
 
     public void changeGameState(String tableId, GameState gameState) {
@@ -127,7 +147,6 @@ public class TableService {
                 table.updatePlayer(player);
                 playerService.save(player);
             }
-            gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingSettings.betting);
         }
         return table;
     }
@@ -280,17 +299,21 @@ public class TableService {
                 int playerWinnings;
                 if (playerBlackJack) {
                     playerWinnings = player.getBet() * table.getBlackJackMultiplier();
+                    player.setLastRoundResult(PlayerRoundResult.BLACKJACK);
                 } else {
                     playerWinnings = player.getBet() * 2;
+                    player.setLastRoundResult(PlayerRoundResult.WON);
                 }
                 player.addWinnings(playerWinnings - player.getBet());
                 player.addBalance(playerWinnings);
                 table.getCroupier().addLosings(playerWinnings);
             } else if (playerValue == croupierValue) {
                 player.addBalance(player.getBet());
+                player.setLastRoundResult(PlayerRoundResult.DRAW);
             } else {
                 player.addLosings(player.getBet());
                 table.getCroupier().addWinnings(player.getBet());
+                player.setLastRoundResult(PlayerRoundResult.LOST);
             }
 
             player.setBet(0);
@@ -298,10 +321,9 @@ public class TableService {
             playerService.save(player);
             table.updatePlayer(player);
         }
-        //TODO: add something to directly notify clients about the round result for them
+        tableDAO.save(table);
         gameStateManager.notifyClients(table.getId());
         gameStateManager.scheduleStateChange(table.getId(), WAITING_FOR_PLAYERS, gameTimingSettings.postGameWaiting);
-        tableDAO.save(table);
         return table;
     }
 }

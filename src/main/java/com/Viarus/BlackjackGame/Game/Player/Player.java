@@ -28,7 +28,9 @@ public class Player {
     List<PlayerDecisions> availableDecisions;
     Hand hand;
     int bet;
+
     boolean isPlaying;
+    PlayerRoundResult lastRoundResult;
 
     public Player(String name, int balance) {
         this.currentTableId = null;
@@ -41,6 +43,7 @@ public class Player {
         this.hand = new Hand();
         this.bet = 0;
         this.isPlaying = false;
+        this.lastRoundResult = PlayerRoundResult.DRAW;
     }
 
     public void placeBet(int amount) {
@@ -66,19 +69,24 @@ public class Player {
     public String toString() {
         return "Player{" +
                 "id='" + id + '\'' +
-                ", tableId='" + currentTableId + '\'' +
+                ", currentTableId='" + currentTableId + '\'' +
                 ", name='" + name + '\'' +
                 ", balance=" + balance +
+                ", totalWinnings=" + totalWinnings +
+                ", totalLosings=" + totalLosings +
+                ", currentAction=" + currentAction +
+                ", availableDecisions=" + availableDecisions +
                 ", hand=" + hand +
                 ", bet=" + bet +
+                ", isPlaying=" + isPlaying +
+                ", lastRoundResult=" + lastRoundResult +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Player)) return false;
-        Player player = (Player) o;
+        if (!(o instanceof Player player)) return false;
         return id != null && id.equals(player.id);
     }
 

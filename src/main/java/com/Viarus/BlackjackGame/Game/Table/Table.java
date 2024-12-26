@@ -27,15 +27,8 @@ public class Table {
     private int turnNumber;
 
     //TODO: Add loading from properties
-//    @Transient
-//    final GameplaySettings gameplaySettings = new GameplaySettings();
-    //@Value("${game.settings.table.maxPlayers}")
     private int maxPlayers = 3;
-
-    //@Value("${game.settings.table.deckCount}")
     private int decksCount = 3;
-
-    //@Value("${game.settings.table.blackJackMultiplier}")
     private int blackJackMultiplier = 3;
 
     public Table() {

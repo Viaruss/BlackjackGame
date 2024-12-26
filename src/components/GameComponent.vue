@@ -53,11 +53,21 @@
       </div>
       <div id="onlineTableFieldContainer">
         <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
+        <div id="timerField" class="infoField">5</div>
+        <!--        TODO: NIE DZIALA A POWINNO-->
+        <div
+            id="resultField"
+            class="infoField"
+            v-if=" this.table && this.table.gameState === 'ROUND_SUMMARY'"
+        >
+          {{ this.player.lastRoundResult }}
+        </div>
         <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
         <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
         <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
       </div>
       <div id="onlinePlayer3FieldContainer">
+        <div id="onlinePlayer3Name">Empty</div>
         <div id="onlinePlayer3Name">Empty</div>
         <div id="onlinePlayer3Balance">Balance:</div>
         <div id="onlinePlayer3Bet">Bet:</div>

@@ -36,15 +36,14 @@ public class GameStateManager {
     }
 
     public synchronized void scheduleStateChange(String tableId, GameState newState, long delayInSeconds) {
-        if (scheduledTask != null) {
-            scheduledTask.cancel(false);
-        }
+        cancelScheduledTask();
         System.out.printf("SCHEDULER - Scheduling state change to %s in %d seconds%n", newState, delayInSeconds);
         scheduledTask = taskScheduler.schedule(() -> setState(tableId, newState), new java.util.Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delayInSeconds)));
     }
 
     public synchronized void cancelScheduledTask() {
         if (scheduledTask != null) {
+            System.out.println("SCHEDULER - Canceling previously scheduled task");
             scheduledTask.cancel(false);
             scheduledTask = null;
         }
