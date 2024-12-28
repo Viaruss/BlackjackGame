@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class GameTimingSettings {
     public int initialWaiting;
     public int betting;
-    public int deciding;
+    public int turnDelay;
     public int croupierDelay;
     public int summaryDelay;
     public int postGameWaiting;

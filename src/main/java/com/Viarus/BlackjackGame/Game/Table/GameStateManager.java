@@ -24,10 +24,14 @@ public class GameStateManager {
         this.tableService = tableService;
     }
 
-    public synchronized void setState(String tableId, GameState newState) {
+    public synchronized void setState(String tableId, GameState newState)  {
         System.out.println("SCHEDULER - Setting state to " + newState);
-        tableService.changeGameState(tableId, newState);
-        notifyClients(tableId);
+        try {
+            tableService.changeGameState(tableId, newState);
+            notifyClients(tableId);
+        } catch (Exception e) {
+            System.out.println("SCHEDULER - Error setting state: " + e.getMessage());
+        }
     }
 
     public void notifyClients(String tableId) {

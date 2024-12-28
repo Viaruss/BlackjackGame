@@ -180,16 +180,22 @@ html {
   grid-area: croupier;
   flex-direction: row;
 }
-#timerField {
+#infoAndTimerContainer {
   grid-area: info;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 180px;
+}
+#timerStateMessage {
+  font-size: 30px;
   color: #cca43b;
   text-shadow: 1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 10px black;
-  visibility: hidden;
+}
+#timerCountdownField {
+  font-size: 120px;
+  color: #cca43b;
+  text-shadow: 1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 10px black;
 }
 #resultField {
   grid-area: info;
@@ -203,7 +209,7 @@ html {
   color: #cca43b;
   padding-bottom: 10px;
   line-height: 180px;
-  text-shadow: 0px 0px 30px black,0px 0px 30px black,0px 0px 30px black,0px 0px 30px black,0px 0px 10px black;
+  text-shadow: 0 0 30px black,0 0 30px black,0 0 30px black,0 0 30px black,0 0 10px black;
 }
 #player1CardsField {
   grid-area: player1;

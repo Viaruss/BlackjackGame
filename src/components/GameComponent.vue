@@ -63,8 +63,10 @@
       </div>
       <div id="onlineTableFieldContainer">
         <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
-        <div id="timerField" class="infoField">5</div>
-        <!--        TODO: NIE DZIALA A POWINNO-->
+        <div id="infoAndTimerContainer" class="infoField">
+          <div id="timerStateMessage"> </div>
+          <div id="timerCountdownField">0</div>
+        </div>
         <div
             id="resultField"
             class="infoField"
@@ -358,6 +360,7 @@ export default {
         document.getElementById(seat.balance).innerText = `Balance: ${player.balance || 0}`;
         document.getElementById(seat.bet).innerText = `Bet: ${player.bet || 0}`;
       });
+      this.updateTimerField();
       this.renderAllCards();
     },
 
@@ -449,6 +452,56 @@ export default {
       }
     },
 
+    updateTimerField() {
+      console.log("Updating timer field... table:", this.table);
+      console.log("time: ", this.table.countdownTime);
+      const countdownTime = this.table?.countdownTime || 0;
+      const message = this.table.stateMessage;
+
+      if (countdownTime === 0) {
+        console.error("Countdown time is 0 or invalid. Timer won't start.");
+        document.getElementById("infoAndTimerContainer").style.visibility = "hidden";
+        return;
+      }
+
+      this.$nextTick(() => {
+        const timerField = document.getElementById("timerCountdownField");
+        const infoField = document.getElementById("timerStateMessage");
+
+        if (!timerField) {
+          console.error("Timer field not found!");
+          return;
+        }
+
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval);
+        }
+        document.getElementById("infoAndTimerContainer").style.visibility = "visible";
+        timerField.innerText = `${countdownTime}s`;
+        infoField.innerText = message;
+
+        let remainingTime = countdownTime;
+        this.timerInterval = setInterval(() => {
+          remainingTime--;
+          const countdownElement = document.getElementById("timerCountdownField");
+
+          if (countdownElement) {
+            countdownElement.innerText = `${remainingTime}s`;
+          }
+
+          if (remainingTime <= 0) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+            this.handleTimerEnd();
+          }
+        }, 1000);
+      });
+    },
+
+    handleTimerEnd() {
+      console.log("Timer ended!");
+      document.getElementById("infoAndTimerContainer").style.visibility = "hidden";
+    },
   },
 };
 </script>

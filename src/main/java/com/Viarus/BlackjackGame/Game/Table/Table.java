@@ -25,6 +25,8 @@ public class Table {
     private Deck cardsInPlay;
     private GameState gameState;
     private int turnNumber;
+    private int countdownTime;
+    private String stateMessage;
 
     //TODO: Add loading from properties
     private int maxPlayers = 3;
@@ -37,6 +39,8 @@ public class Table {
         this.croupier = new Croupier();
         this.cardsInPlay = new Deck(decksCount);
         this.gameState = GameState.WAITING_FOR_PLAYERS;
+        this.countdownTime = 0;
+        this.stateMessage = "";
     }
 
     public void addPlayer(Player player) throws Exception {
