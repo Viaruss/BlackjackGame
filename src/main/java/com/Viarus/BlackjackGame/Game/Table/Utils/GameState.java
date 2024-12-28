@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Game.Table;
+package com.Viarus.BlackjackGame.Game.Table.Utils;
 
 public enum GameState {
     WAITING_FOR_PLAYERS,

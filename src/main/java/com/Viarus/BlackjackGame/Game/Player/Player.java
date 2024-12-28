@@ -1,6 +1,9 @@
 package com.Viarus.BlackjackGame.Game.Player;
 
 import com.Viarus.BlackjackGame.Cards.Hand;
+import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerActions;
+import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerDecisions;
+import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerRoundResult;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +24,7 @@ public class Player {
     String name;
 
     int balance;
+    int learningBalance;
     int totalWinnings;
     int totalLosings;
 
@@ -36,6 +40,7 @@ public class Player {
         this.currentTableId = null;
         this.name = name;
         this.balance = balance;
+        this.learningBalance = 100000;
         this.totalWinnings = 0;
         this.totalLosings = 0;
         currentAction = PlayerActions.WAITING;

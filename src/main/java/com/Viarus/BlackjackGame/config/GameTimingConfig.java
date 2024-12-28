@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Game.Table;
+package com.Viarus.BlackjackGame.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "game.settings.delays")
-public class GameTimingSettings {
+public class GameTimingConfig {
     public int initialWaiting;
     public int betting;
     public int turnDelay;

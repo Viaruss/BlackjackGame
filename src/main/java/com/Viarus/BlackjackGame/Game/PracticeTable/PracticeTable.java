@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Game.Table;
+package com.Viarus.BlackjackGame.Game.PracticeTable;
 
 import com.Viarus.BlackjackGame.Cards.Deck;
 import com.Viarus.BlackjackGame.Game.Croupier.Croupier;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 @Document
 @Getter
 @Setter
-public class Table {
+public class PracticeTable {
     @Id
     @Setter(AccessLevel.NONE)
     String id;
@@ -29,12 +29,12 @@ public class Table {
     private int countdownTime;
     private String stateMessage;
 
-    //TODO: Add loading from properties
+    //TODO: Add loading from properties (might be possible to do it in a constructor when creating new table - verify)
     private int maxPlayers = 3;
     private int decksCount = 3;
     private int blackJackMultiplier = 3;
 
-    public Table() {
+    public PracticeTable() {
         this.players = new ArrayList<>();
         for (int i = 0; i < maxPlayers; i++) players.add(null);
         this.croupier = new Croupier();

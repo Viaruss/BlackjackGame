@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Game.Table;
+package com.Viarus.BlackjackGame.Game.PracticeTable;
 
 import com.Viarus.BlackjackGame.Cards.Hand;
 import com.Viarus.BlackjackGame.Game.Player.Player;
@@ -7,8 +7,8 @@ import com.Viarus.BlackjackGame.Game.Player.PlayerService;
 import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerActions;
 import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerDecisions;
 import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerRoundResult;
+import com.Viarus.BlackjackGame.Game.PracticeTable.Utils.PracticeGameStateManager;
 import com.Viarus.BlackjackGame.Game.Table.Utils.GameState;
-import com.Viarus.BlackjackGame.Game.Table.Utils.GameStateManager;
 import com.Viarus.BlackjackGame.config.GameTimingConfig;
 import com.Viarus.BlackjackGame.config.GameplayConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -21,60 +21,60 @@ import static com.Viarus.BlackjackGame.Game.Table.Utils.GameState.*;
 
 @Slf4j
 @Service
-public class TableService {
-    private final TableDAO tableDAO;
+public class PracticeTableService {
+    private final PracticeTableDAO practiceTableDAO;
     private final PlayerService playerService;
     private final PlayerDAO playerDAO;
     public final GameTimingConfig gameTimingConfig;
-    public final GameStateManager gameStateManager;
+    public final PracticeGameStateManager practiceGameStateManager;
     public final GameplayConfig gameplayConfig;
 
 
-    public TableService(TableDAO tableDAO,
-                        PlayerService playerService,
-                        PlayerDAO playerDAO,
-                        GameStateManager gameStateManager,
-                        GameTimingConfig gameTimingConfig,
-                        GameplayConfig gameplayConfig) {
-        this.tableDAO = tableDAO;
+    public PracticeTableService(PracticeTableDAO practiceTableDAO,
+                                PlayerService playerService,
+                                PlayerDAO playerDAO,
+                                PracticeGameStateManager practiceGameStateManager,
+                                GameTimingConfig gameTimingConfig,
+                                GameplayConfig gameplayConfig) {
+        this.practiceTableDAO = practiceTableDAO;
         this.playerService = playerService;
         this.playerDAO = playerDAO;
-        this.gameStateManager = gameStateManager;
+        this.practiceGameStateManager = practiceGameStateManager;
         this.gameTimingConfig = gameTimingConfig;
         this.gameplayConfig = gameplayConfig;
     }
 
-    public Table getTable(String tableId) {
-        return tableDAO.findById(tableId).orElse(null);
+    public PracticeTable getTable(String tableId) {
+        return practiceTableDAO.findById(tableId).orElse(null);
     }
 
-    public Table createNewTable() {
-        Table table = new Table();
-        tableDAO.save(table);
+    public PracticeTable createNewTable() {
+        PracticeTable table = new PracticeTable();
+        practiceTableDAO.save(table);
         return table;
     }
 
-    public List<Table> getAllTables() {
-        return tableDAO.findAll();
+    public List<PracticeTable> getAllTables() {
+        return practiceTableDAO.findAll();
     }
 
-    public Table joinTable(String tableId, String playerId) throws Exception {
-        Table table = getTable(tableId);
+    public PracticeTable joinTable(String tableId, String playerId) throws Exception {
+        PracticeTable table = getTable(tableId);
         Player player = playerService.getPlayerById(playerId);
         if (!table.players.contains(player) && Objects.equals(player.getCurrentTableId(), null)) {
             player.setCurrentAction(table.getGameState() == BETTING ? PlayerActions.BETTING : PlayerActions.WAITING);
             table.addPlayer(player);
             player.setCurrentTableId(tableId);
-            tableDAO.save(table);
+            practiceTableDAO.save(table);
             playerDAO.save(player);
         }
         if (Objects.equals(player.getCurrentTableId(), tableId)) {
             if (table.getPlayers().stream().filter(Objects::nonNull).count() == 1) {
                 table.setStateMessage("Preparing Table");
                 table.setCountdownTime(gameTimingConfig.initialWaiting);
-                tableDAO.save(table);
-                gameStateManager.notifyClients(table.getId());
-                gameStateManager.scheduleStateChange(tableId, BETTING, gameTimingConfig.initialWaiting);
+                practiceTableDAO.save(table);
+                practiceGameStateManager.notifyClients(table.getId());
+                practiceGameStateManager.scheduleStateChange(tableId, BETTING, gameTimingConfig.initialWaiting);
             }
             return table;
         } else {
@@ -82,29 +82,29 @@ public class TableService {
         }
     }
 
-    public Table leaveTable(String tableId, String playerId) {
-        Table table = getTable(tableId);
+    public PracticeTable leaveTable(String tableId, String playerId) {
+        PracticeTable table = getTable(tableId);
         Player player = playerService.getPlayerById(playerId);
 
-        gameStateManager.cancelScheduledTask();
+        practiceGameStateManager.cancelScheduledTask();
         table.removePlayer(player);
         player.leaveTable();
 
-        if (table.players.stream().filter(Objects::nonNull).toList().isEmpty()) {
+        if(table.players.stream().filter(Objects::nonNull).toList().isEmpty()) {
             table.getCroupier().setHand(new Hand());
             table.setGameState(WAITING_FOR_PLAYERS);
         }
 
-        tableDAO.save(table);
+        practiceTableDAO.save(table);
         playerDAO.save(player);
 
         return table;
     }
 
-    public Table placeBet(String tableId, String playerId, int amount) throws Exception {
+    public PracticeTable placeBet(String tableId, String playerId, int amount) throws Exception {
         if (playerService.getPlayerById(playerId).getCurrentAction() == PlayerActions.BETTING) {
-            Table table = getTable(tableId);
-            if (table.getGameState() != BETTING) {
+            PracticeTable table = getTable(tableId);
+            if(table.getGameState() != BETTING) {
                 throw new Exception("This table is not in betting state");
             }
             Player player = playerService.placeBet(playerId, amount);
@@ -112,12 +112,12 @@ public class TableService {
 
             table.updatePlayer(player);
             checkBettingStatus(table);
-            tableDAO.save(table);
+            practiceTableDAO.save(table);
             return table;
         } else throw new Exception("This player cannot place bets now");
     }
 
-    private void checkBettingStatus(Table table) {
+    private void checkBettingStatus(PracticeTable table) {
         List<Player> currentPlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
         int betCount = 0;
         for (Player player : currentPlayers) {
@@ -126,17 +126,17 @@ public class TableService {
         if (betCount == 1) {
             table.setStateMessage("Waiting for other bets");
             table.setCountdownTime(gameTimingConfig.betting);
-            gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingConfig.betting);
-        } else if (betCount == currentPlayers.size()) {
+            practiceGameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingConfig.betting);
+        } else if (betCount == currentPlayers.size()){
             table.setStateMessage("All bets placed");
             table.setCountdownTime(1);
-            gameStateManager.scheduleStateChange(table.getId(), PLAYING, 1);
+            practiceGameStateManager.scheduleStateChange(table.getId(), PLAYING, 1);
         }
     }
 
     public void changeGameState(String tableId, GameState gameState) throws Exception {
-        Table table = getTable(tableId);
-        Table updatedTable = switch (gameState) {
+        PracticeTable table = getTable(tableId);
+        PracticeTable updatedTable = switch (gameState) {
             case BETTING -> startBetting(table);
             case PLAYING -> startGame(table);
             case NEXT_TURN -> passTurn(table);
@@ -144,20 +144,20 @@ public class TableService {
             case ROUND_SUMMARY -> roundResult(table);
             case WAITING_FOR_PLAYERS -> prepareGame(table);
         };
-        tableDAO.save(updatedTable);
-        gameStateManager.notifyClients(table.getId());
+        practiceTableDAO.save(updatedTable);
+        practiceGameStateManager.notifyClients(table.getId());
     }
 
-    private Table prepareGame(Table table) {
+    private PracticeTable prepareGame(PracticeTable table) {
         table.setGameState(WAITING_FOR_PLAYERS);
         clearCards(table);
         table.setStateMessage("Waiting for players");
         table.setCountdownTime(gameTimingConfig.postGameWaiting);
-        gameStateManager.scheduleStateChange(table.getId(), BETTING, gameTimingConfig.initialWaiting);
+        practiceGameStateManager.scheduleStateChange(table.getId(), BETTING, gameTimingConfig.initialWaiting);
         return table;
     }
 
-    public Table startBetting(Table table) {
+    public PracticeTable startBetting(PracticeTable table) {
         if (table.getGameState() == WAITING_FOR_PLAYERS) {
             table.setGameState(BETTING);
             table.setStateMessage("");
@@ -172,14 +172,14 @@ public class TableService {
         return table;
     }
 
-    public Table startGame(Table table) {
+    public PracticeTable startGame(PracticeTable table) {
         if (table.getGameState() != BETTING) {
             return table;
         } else if (table.getPlayers().stream().filter(Objects::nonNull).noneMatch(player -> player.getBet() > 0)) {
             System.out.println("No bets placed");
             table.setStateMessage("Waiting for bets");
             table.setCountdownTime(gameTimingConfig.betting);
-            gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingConfig.betting);
+            practiceGameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingConfig.betting);
             return table;
         }
         table.setGameState(PLAYING);
@@ -225,23 +225,23 @@ public class TableService {
         }
         table.setCountdownTime(gameTimingConfig.turnDelay);
         table.setStateMessage("%s's turn".formatted(availablePlayers.get(0).getName()));
-        gameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingConfig.turnDelay);
+        practiceGameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingConfig.turnDelay);
         return table;
     }
 
-    private Table passTurn(Table table) throws Exception {
+    private PracticeTable passTurn(PracticeTable table) throws Exception {
         processPlayerDecision(table.players.get(table.getTurnNumber()), table, PlayerDecisions.STAND);
         return table;
     }
 
-    private void clearCards(Table table) {
+    private void clearCards(PracticeTable table) {
         table.getCroupier().setHand(new Hand());
         for (Player player : table.getPlayers().stream().filter(Objects::nonNull).toList()) {
             player.setHand(new Hand());
         }
     }
 
-    public Table croupierTurn(Table table) {
+    public PracticeTable croupierTurn(PracticeTable table) {
         if (table.getGameState() != PLAYING) {
             return null;
         }
@@ -253,11 +253,11 @@ public class TableService {
         }
         table.setStateMessage("Waiting for summary");
         table.setCountdownTime(gameTimingConfig.summaryDelay);
-        gameStateManager.scheduleStateChange(table.getId(), GameState.ROUND_SUMMARY, gameTimingConfig.summaryDelay);
+        practiceGameStateManager.scheduleStateChange(table.getId(), GameState.ROUND_SUMMARY, gameTimingConfig.summaryDelay);
         return table;
     }
 
-    public Table processPlayerDecision(Player player, Table table, PlayerDecisions decision) throws Exception {
+    public PracticeTable processPlayerDecision(Player player, PracticeTable table, PlayerDecisions decision) throws Exception {
         if (table.players.indexOf(player) != table.getTurnNumber() ||
                 player.getHand().isOver ||
                 table.getGameState() != PLAYING) {
@@ -275,7 +275,7 @@ public class TableService {
                     } else {
                         table.setCountdownTime(gameTimingConfig.turnDelay);
                         table.setStateMessage("%s's turn".formatted(player.getName()));
-                        gameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingConfig.turnDelay);
+                        practiceGameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingConfig.turnDelay);
                     }
                 }
                 case STAND -> {
@@ -292,12 +292,12 @@ public class TableService {
             player.evaluatePossibleDecisions();
             table.updatePlayer(player);
         }
-        gameStateManager.notifyClients(table.getId());
+        practiceGameStateManager.notifyClients(table.getId());
 
         return table;
     }
 
-    private void nextTurn(Table table) {
+    private void nextTurn(PracticeTable table) {
         table.setTurnNumber(table.getTurnNumber() + 1);
         List<Player> availablePlayers = table.getPlayers()
                 .stream()
@@ -306,7 +306,7 @@ public class TableService {
         if (table.getTurnNumber() == availablePlayers.size()) {
             table.setStateMessage("Croupier Turn");
             table.setCountdownTime(gameTimingConfig.croupierDelay);
-            gameStateManager.scheduleStateChange(table.getId(), GameState.CROUPIER_TURN, gameTimingConfig.croupierDelay);
+            practiceGameStateManager.scheduleStateChange(table.getId(), GameState.CROUPIER_TURN, gameTimingConfig.croupierDelay);
         } else if (!availablePlayers.get(table.getTurnNumber()).isPlaying()) {
             nextTurn(table);
         } else {
@@ -314,18 +314,18 @@ public class TableService {
             player.setCurrentAction(PlayerActions.DECIDING);
             table.updatePlayer(player);
             playerService.save(player);
-            tableDAO.save(table);
+            practiceTableDAO.save(table);
             table.setCountdownTime(gameTimingConfig.turnDelay);
             table.setStateMessage("%s's turn".formatted(player.getName()));
-            gameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingConfig.turnDelay);
+            practiceGameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingConfig.turnDelay);
         }
     }
 
-    public void save(Table table) {
-        tableDAO.save(table);
+    public void save(PracticeTable table) {
+        practiceTableDAO.save(table);
     }
 
-    public Table roundResult(Table table) {
+    public PracticeTable roundResult(PracticeTable table) {
         table.setGameState(ROUND_SUMMARY);
         int croupierValue = table.getCroupier().getHand().value;
         System.out.printf("Croupier %d\n", croupierValue);
@@ -365,7 +365,7 @@ public class TableService {
         }
         table.setStateMessage("Preparing next round");
         table.setCountdownTime(gameTimingConfig.postGameWaiting);
-        gameStateManager.scheduleStateChange(table.getId(), WAITING_FOR_PLAYERS, gameTimingConfig.postGameWaiting);
+        practiceGameStateManager.scheduleStateChange(table.getId(), WAITING_FOR_PLAYERS, gameTimingConfig.postGameWaiting);
         return table;
     }
 }

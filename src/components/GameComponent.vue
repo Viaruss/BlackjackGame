@@ -66,6 +66,8 @@
       </div>
     </div>
 
+    <!--                            ONLINE TABLE                          -->
+
     <div id="onlineTableContainer" class="tableContainer">
       <div id="onlinePlayer1FieldContainer">
         <div id="onlinePlayer1Name">Empty</div>
@@ -79,6 +81,78 @@
           <div id="timerCountdownField">0</div>
         </div>
         <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
+        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
+        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
+      </div>
+      <div id="onlinePlayer3FieldContainer">
+        <div id="onlinePlayer3Name">Empty</div>
+        <div id="onlinePlayer3Balance">Balance:</div>
+        <div id="onlinePlayer3Bet">Bet:</div>
+      </div>
+      <div id="onlinePlayer2FieldContainer">
+        <div id="onlinePlayer2InfoFieldContainer">
+          <div id="onlinePlayer2InformationContainer">
+            <div id="onlinePlayer2Balance"></div>
+            <div id="onlinePlayer2Name"></div>
+            <div id="onlinePlayer2Bet"></div>
+          </div>
+        </div>
+        <div id="onlinePlayer2ControlsFieldContainer">
+          <div id="onlinePlayer2BetsPanelContainer" v-if="this.player && this.player.currentAction === 'BETTING'">
+            <div id="betsControlAmountContainer">
+              Amount: {{ this.playerBetCount }}
+            </div>
+            <div id="betsControlsCoinContainer">
+              <button id="betsControlsCoin5" class="coinButton coinButton1" @click="this.playerBetCount += 5">5</button>
+              <button id="betsControlsCoin10" class="coinButton coinButton2" @click="this.playerBetCount += 10">10
+              </button>
+              <button id="betsControlsCoin25" class="coinButton coinButton3" @click="this.playerBetCount += 25">25
+              </button>
+              <button id="betsControlsCoin50" class="coinButton coinButton4" @click="this.playerBetCount += 50">50
+              </button>
+              <button id="betsControlsCoin100" class="coinButton coinButton5" @click="this.playerBetCount += 100">100
+              </button>
+              <button id="betsControlPlaceButton" class="button" @click="placeBet">Place Bet</button>
+              <button id="betsControlPlaceButton" class="button" @click="this.playerBetCount = 0">Reset</button>
+            </div>
+          </div>
+          <div id="onlinePlayer2ActionsPanelContainer" v-if="this.player && this.player.currentAction === 'DECIDING'">
+            <button
+                v-for="decision in this.player.availableDecisions"
+                :key="decision"
+                class="button"
+                @click="makeMove(decision)">
+              {{ decision }}
+            </button>
+          </div>
+          <div
+              id="resultField"
+              v-if="this.table && this.table.gameState === 'ROUND_SUMMARY'"
+          >
+            {{
+              this.player.lastRoundResult === 'WON' ? 'You WON!' :
+                  this.player.lastRoundResult === 'LOST' ? 'You lost...' :
+                      this.player.lastRoundResult === 'DRAW' ? 'It\'s a draw!' :
+                          this.player.lastRoundResult === 'BLACKJACK' ? 'BLACKJACK!' :
+                              'Unknown result'
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--                            LEARNING TABLE                          -->
+
+    <div id="learningTableContainer" class="tableContainer">
+      <div id="gameStatsContainer">
+<!--            TODO: game statistics                -->
+      </div>
+      <div id="onlineTableFieldContainer">
+        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
+        <div id="infoAndTimerContainer" class="infoField">
+          <div id="timerStateMessage"></div>
+          <div id="timerCountdownField">0</div>
+        </div>
         <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
         <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
       </div>

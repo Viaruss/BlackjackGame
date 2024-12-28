@@ -1,5 +1,7 @@
-package com.Viarus.BlackjackGame.Game.Table;
+package com.Viarus.BlackjackGame.Game.Table.Utils;
 
+import com.Viarus.BlackjackGame.Game.Table.Table;
+import com.Viarus.BlackjackGame.Game.Table.TableService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.TaskScheduler;
