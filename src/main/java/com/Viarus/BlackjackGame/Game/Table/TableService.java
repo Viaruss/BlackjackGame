@@ -112,8 +112,7 @@ public class TableService {
         if (betCount == 1) {
             gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingSettings.betting);
         } else if (betCount == currentPlayers.size()){
-            gameStateManager.cancelScheduledTask();
-            gameStateManager.scheduleStateChange(table.getId(), PLAYING, 0);
+            gameStateManager.scheduleStateChange(table.getId(), PLAYING, 1);
         }
     }
 
