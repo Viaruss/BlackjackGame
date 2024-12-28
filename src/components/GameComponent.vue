@@ -25,9 +25,20 @@
         <h1 id="gameModeMenuTitle" class="title">Choose Game Mode</h1>
       </div>
       <div id="gameModeMenuButtonsContainer" class="contentContainer">
-        <button id="practiceModeButton" class="button" @click="selectPracticeMode">Practice</button>
-        <button id="learnModeButton" class="button" @click="selectLearnMode">Learn</button>
-        <button id="onlineModeButton" class="button" @click="selectOnlineMode">Online</button>
+        <button id="learnModeButton" class="button"
+                @mouseenter="hoverMode('Learn more about the game rules and strategies, play along with the computer and practice your skills!')"
+                @mouseleave="resetModeText('Learn')"
+                @click="selectLearnMode"
+        >
+          Learn
+        </button>
+        <button id="onlineModeButton" class="button"
+                @mouseenter="hoverMode('Play with other players online!')"
+                @mouseleave="resetModeText('Online')"
+                @click="selectOnlineMode"
+        >
+          Online
+        </button>
       </div>
     </div>
 
@@ -72,7 +83,6 @@
         <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
       </div>
       <div id="onlinePlayer3FieldContainer">
-        <div id="onlinePlayer3Name">Empty</div>
         <div id="onlinePlayer3Name">Empty</div>
         <div id="onlinePlayer3Balance">Balance:</div>
         <div id="onlinePlayer3Bet">Bet:</div>
@@ -162,6 +172,15 @@ export default {
   },
 
   methods: {
+    hoverMode(description) {
+      const modeButton = event.target;
+      modeButton.innerText = description;
+    },
+    resetModeText(originalText) {
+      const modeButton = event.target;
+      modeButton.innerText = originalText;
+    },
+
     async handleBeforeUnload(event) {
       await this.disconnectFromSocket();
 
@@ -211,11 +230,6 @@ export default {
         console.error('Error creating player:', error);
       }
     },
-
-    selectPracticeMode() {
-      document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
-    },
-
     selectLearnMode() {
       document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
     },
