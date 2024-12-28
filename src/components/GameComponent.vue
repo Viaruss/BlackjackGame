@@ -64,15 +64,8 @@
       <div id="onlineTableFieldContainer">
         <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
         <div id="infoAndTimerContainer" class="infoField">
-          <div id="timerStateMessage"> </div>
+          <div id="timerStateMessage"></div>
           <div id="timerCountdownField">0</div>
-        </div>
-        <div
-            id="resultField"
-            class="infoField"
-            v-if=" this.table && this.table.gameState === 'ROUND_SUMMARY'"
-        >
-          {{ this.player.lastRoundResult }}
         </div>
         <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
         <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
@@ -120,7 +113,18 @@
               {{ decision }}
             </button>
           </div>
-
+          <div
+              id="resultField"
+              v-if="this.table && this.table.gameState === 'ROUND_SUMMARY'"
+          >
+            {{
+              this.player.lastRoundResult === 'WON' ? 'You WON!' :
+                  this.player.lastRoundResult === 'LOST' ? 'You lost...' :
+                      this.player.lastRoundResult === 'DRAW' ? 'It\'s a draw!' :
+                          this.player.lastRoundResult === 'BLACKJACK' ? 'BLACKJACK!' :
+                              'Unknown result'
+            }}
+          </div>
         </div>
       </div>
     </div>

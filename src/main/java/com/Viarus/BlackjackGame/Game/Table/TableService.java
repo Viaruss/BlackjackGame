@@ -263,6 +263,10 @@ public class TableService {
                     if (player.getHand().isOver) {
                         player.setCurrentAction(PlayerActions.WAITING);
                         nextTurn(table);
+                    } else {
+                        table.setCountdownTime(gameTimingSettings.turnDelay);
+                        table.setStateMessage("%s's turn".formatted(player.getName()));
+                        gameStateManager.scheduleStateChange(table.getId(), NEXT_TURN, gameTimingSettings.turnDelay);
                     }
                 }
                 case STAND -> {
@@ -313,6 +317,7 @@ public class TableService {
     }
 
     public Table roundResult(Table table) {
+        table.setGameState(ROUND_SUMMARY);
         int croupierValue = table.getCroupier().getHand().value;
         System.out.printf("Croupier %d\n", croupierValue);
         for (Player player : table.getPlayers().stream().filter(Objects::nonNull).toList()) {
