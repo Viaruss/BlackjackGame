@@ -10,6 +10,16 @@
       </div>
     </div>
 
+    <div id="nameNotFoundContainer" class="popUpContainer">
+      <div id="nameNotFoundTitleContainer" class="titleContainer">
+        <h1 id="nameNotFoundTitle" class="title">Player not found!</h1>
+      </div>
+      <div id="nameNotFoundFieldContainer" class="contentContainer">
+        <button id="nameNotFoundReturn" class="button" @click="returnToNameInput">Try Again</button>
+        <button id="nameNotFoundCreate" class="button" @click="handleCreatePlayer">Create Player</button>
+      </div>
+    </div>
+
     <div id="gameModeMenuContainer" class="popUpContainer">
       <div id="gameModeMenuTitleContainer" class="titleContainer">
         <h1 id="gameModeMenuTitle" class="title">Choose Game Mode</h1>
@@ -155,26 +165,44 @@ export default {
 
     handleNameSubmit() {
       if (this.playerName) {
-        this.getPlayer(this.playerName).then(() => {
-          document.getElementById('nameInputContainer').style.visibility = 'hidden';
-          document.getElementById('gameModeMenuContainer').style.visibility = 'visible';
-        });
+        this.getPlayer();
       } else {
         alert('Please enter a name');
       }
     },
 
-    async getPlayer(name) {
+    async getPlayer() {
       try {
-        const response = await fetch(`/api/v1/player?name=${name}`);
+        const response = await fetch(`/api/v1/player?name=${this.playerName}`);
         if (response.ok) {
+          document.getElementById('nameInputContainer').style.visibility = 'hidden';
+          document.getElementById('gameModeMenuContainer').style.visibility = 'visible';
           this.player = await response.json();
         } else {
-          const postResponse = await fetch(`/api/v1/player?name=${name}`, {method: 'POST'});
-          if (postResponse.ok) this.player = await postResponse.json();
+          document.getElementById('nameNotFoundContainer').style.visibility = 'visible';
+          document.getElementById('nameInputContainer').style.visibility = 'hidden';
+
         }
       } catch (error) {
-        console.error('Error fetching/creating player:', error);
+        console.error('Error fetching player:', error);
+      }
+    },
+
+    returnToNameInput() {
+      document.getElementById('nameNotFoundContainer').style.visibility = 'hidden';
+      document.getElementById('nameInputContainer').style.visibility = 'visible';
+    },
+
+    async handleCreatePlayer() {
+      try {
+        const postResponse = await fetch(`/api/v1/player?name=${this.playerName}`, {method: 'POST'});
+        if (postResponse.ok) {
+          this.player = await postResponse.json();
+          document.getElementById('nameNotFoundContainer').style.visibility = 'hidden';
+          document.getElementById('gameModeMenuContainer').style.visibility = 'visible';
+        }
+      } catch (error) {
+        console.error('Error creating player:', error);
       }
     },
 
@@ -276,7 +304,7 @@ export default {
     createCardElement(card, index) {
       const cardImg = document.createElement("img");
       cardImg.className = "Card";
-      if(card.isHidden) {
+      if (card.isHidden) {
         cardImg.src = require(`@/assets/images/cards/Rev.png`);
         cardImg.alt = `$Hidden`;
       } else {
@@ -424,7 +452,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 </style>
 
