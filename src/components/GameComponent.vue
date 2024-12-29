@@ -25,7 +25,7 @@
         <h1 id="gameModeMenuTitle" class="title">Choose Game Mode</h1>
       </div>
       <div id="gameModeMenuButtonsContainer" class="contentContainer">
-        <button id="learnModeButton" class="button"
+        <button id="practiceModeButton" class="button"
                 @mouseenter="hoverMode('Learn more about the game rules and strategies, play along with the computer and practice your skills!')"
                 @mouseleave="resetModeText('Learn')"
                 @click="selectLearnMode"
@@ -141,26 +141,70 @@
       </div>
     </div>
 
-    <!--                            LEARNING TABLE                          -->
+    <!--                            PRACTICE TABLE                          -->
+    <div id="practiceTableContainer" class="tableContainer">
+      <div id="gameInfoContainer">
+        <div id="houseEdgeContainer">
+          <div id="houseEdgeH">House</div>
+          <div id="houseEdgeIndicator">
+            <div
+                id="indicatorTop"
+                :style="{ height: indicatorTopHeight + '%' }"
+            ></div>
+            <div
+                id="indicatorBottom"
+                :style="{ height: indicatorBottomHeight + '%' }"
+            ></div>
+          </div>
+          <div id="houseEdgeP">Player</div>
+        </div>
+        <div id="otherStatsContainer">
+          <span class="valueContainer">
+            <span class="statDescription">Running Value: </span><span class="statValue">{{ runningValue }}</span>
+          </span>
+          <span class="valueContainer">
+            <span class="statDescription">True Value: </span><span class="statValue">{{ trueValue }}</span>
+          </span>
+          <span class="valueContainer">
+            <span class="statDescription">House Edge: </span><span class="statValue">{{ houseEdge }}%</span>
+          </span>
 
-    <div id="learningTableContainer" class="tableContainer">
-      <div id="gameStatsContainer">
-<!--            TODO: game statistics                -->
+          <span class="valueContainer">
+            <span class="statDescription">Cards in play: </span><span class="statValue">{{ cardsInPlay }}</span>
+          </span>
+          <span class="valueContainer">
+            <span class="statDescription">Cards played: </span><span class="statValue">{{ cardsPlayed }}</span>
+          </span>
+          <span class="valueContainer">
+            <span class="statDescription">Cards left: </span><span class="statValue">{{ cardsLeft }}</span>
+          </span>
+
+          <span class="valueContainer">
+            <span class="statDescription">Croupier: </span><span class="statValue">{{ croupierValue }}</span>
+          </span>
+          <span class="valueContainer">
+            <span class="statDescription">You: </span><span class="statValue">{{ playerValue }}</span>
+          </span>
+          <span class="valueContainer">
+          <span class="statDescription">Bot: </span><span class="statValue">{{ botValue }}</span>
+          </span>
+        </div>
       </div>
-      <div id="onlineTableFieldContainer">
+      <div id="practiceTableFieldContainer">
         <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
         <div id="infoAndTimerContainer" class="infoField">
           <div id="timerStateMessage"></div>
           <div id="timerCountdownField">0</div>
         </div>
-        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
-        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
+        <div id="localPlayerCardsField" class="tableCardsField">player2CardsField</div>
+        <div id="botCardsField" class="tableCardsField">player3CardsField</div>
       </div>
-      <div id="onlinePlayer3FieldContainer">
-        <div id="onlinePlayer3Name">Empty</div>
-        <div id="onlinePlayer3Balance">Balance:</div>
-        <div id="onlinePlayer3Bet">Bet:</div>
+      <div id="botFieldContainer">
+        <div id="botName">Empty</div>
+        <div id="botBalance">Balance:</div>
+        <div id="botBet">Bet:</div>
       </div>
+
       <div id="onlinePlayer2FieldContainer">
         <div id="onlinePlayer2InfoFieldContainer">
           <div id="onlinePlayer2InformationContainer">
@@ -240,9 +284,46 @@ export default {
       player: null,
       tables: [],
       table: null,
+      practiceTable: null,
       playerBetCount: 0,
       stompClient: null,
     };
+  },
+
+  computed: {
+    indicatorTopHeight() {
+      return this.practiceTable ? 50 + this.practiceTable.houseEdge * 50 : 50;
+    },
+    indicatorBottomHeight() {
+      return this.practiceTable ? 50 - this.practiceTable.houseEdge * 50 : 50;
+    },
+    houseEdge() {
+      return this.practiceTable ? this.practiceTable.houseEdge : 0;
+    },
+    runningValue() {
+      return this.practiceTable ? this.practiceTable.runningValue : 0;
+    },
+    trueValue() {
+      return this.practiceTable ? this.practiceTable.trueValue : 0;
+    },
+    cardsInPlay() {
+      return this.practiceTable ? this.practiceTable.cardsInPlay : 0;
+    },
+    cardsPlayed() {
+      return this.practiceTable ? this.practiceTable.cardsPlayed : 0;
+    },
+    cardsLeft() {
+      return this.practiceTable ? this.practiceTable.cardsInPlay - this.practiceTable.cardsPlayed : 0;
+    },
+    croupierValue() {
+      return this.practiceTable ? this.practiceTable.croupierValue : 0;
+    },
+    playerValue() {
+      return this.practiceTable ? this.practiceTable.playerValue : 0;
+    },
+    botValue() {
+      return this.practiceTable ? this.practiceTable.botValue : 0;
+    },
   },
 
   methods: {
@@ -306,6 +387,7 @@ export default {
     },
     selectLearnMode() {
       document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
+      document.getElementById('practiceTableContainer').style.visibility = 'visible';
     },
 
     async selectOnlineMode() {

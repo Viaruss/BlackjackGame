@@ -72,7 +72,7 @@ body, html {
 /* Active state (pressed effect) */
 .button:active,
 .coinButton:active,
-.joinGameTableListElement:active  {
+.joinGameTableListElement:active {
   transform: scale(1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -94,24 +94,24 @@ body, html {
   min-width: 80%;
 }
 
+.tableContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
 #gameModeMenuContainer,
 #onlineMenuContainer,
 #joinGameContainer,
 #nameNotFoundContainer,
 #onlineTableContainer,
-#learningTableContainer {
+#practiceTableContainer {
   visibility: hidden;
 }
 
-/*TODO: Delete*/
-#onlineTableContainer {
-  visibility: hidden;
-}
-#nameInputContainer {
- visibility: visible;
-}
-
-  /* name input */
 #nameInputField {
   color: @light2;
   background: @dark1;
@@ -181,8 +181,6 @@ body, html {
   color: @light1;
 }
 
-/*game table*/
-/* Table - Top Center */
 #onlineTableFieldContainer {
   grid-area: table;
   display: grid;
@@ -217,15 +215,18 @@ body, html {
   justify-content: center;
   align-items: center;
 }
-#timerStateMessage {
+
+#timerStateMessage,
+#practiceStateMessage {
   font-size: 30px;
   color: @accent;
-  text-shadow: 1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 10px black;
+  text-shadow: 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 10px black;
 }
+
 #timerCountdownField {
   font-size: 120px;
   color: @accent;
-  text-shadow: 1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 20px black,1px 1px 10px black;
+  text-shadow: 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 10px black;
 }
 
 #resultField {
@@ -239,7 +240,7 @@ body, html {
   color: @accent;
   padding-bottom: 10px;
   line-height: 180px;
-  text-shadow: 0 0 30px black,0 0 30px black,0 0 30px black,0 0 30px black,0 0 10px black;
+  text-shadow: 0 0 30px black, 0 0 30px black, 0 0 30px black, 0 0 30px black, 0 0 10px black;
 }
 
 #player1CardsField {
@@ -249,12 +250,14 @@ body, html {
   align-items: center;
 }
 
-#player2CardsField {
+#player2CardsField,
+#localPlayerCardsField {
   grid-area: player2;
   flex-direction: row;
 }
 
-#player3CardsField {
+#player3CardsField,
+#botCardsField {
   grid-area: player3;
   flex-direction: column;
   justify-content: center;
@@ -283,6 +286,7 @@ body, html {
 }
 
 #onlinePlayer3FieldContainer,
+#botFieldContainer,
 #onlinePlayer1FieldContainer {
   display: inline-flex;
   flex-direction: column;
@@ -293,16 +297,20 @@ body, html {
 
 #onlinePlayer1Name,
 #onlinePlayer3Name,
+#botName,
 #onlinePlayer1Balance,
 #onlinePlayer3Balance,
+#botBalance,
 #onlinePlayer1Bet,
-#onlinePlayer3Bet{
+#onlinePlayer3Bet,
+#botBet {
   border-left: 5px solid @accent;
   padding-left: 10px;
 }
 
 #croupierCardsField .Card,
-#player2CardsField .Card {
+#player2CardsField .Card,
+#localPlayerCardsField .Card {
   left: calc(50% - 40px);
   top: 0;
   margin-left: -40px;
@@ -314,27 +322,32 @@ body, html {
   margin-top: -80px;
 }
 
-#player3CardsField .Card {
-  transform: rotate(-90deg); /* Rotate -90 degrees for Player 3 */
+#player3CardsField .Card,
+#botCardsField .Card {
+  transform: rotate(-90deg);
   transform-origin: center;
   margin-top: -80px;
 }
 
 #croupierCardsField .Card:first-child,
-#player2CardsField .Card:first-child {
+#player2CardsField .Card:first-child,
+#localPlayerCardsField .Card:first-child {
   margin-left: 0;
 }
 
 #player1CardsField .Card:first-child,
-#player3CardsField .Card:first-child {
+#player3CardsField .Card:first-child,
+#botCardsField .Card:first-child {
   margin-top: 0;
 }
 
-#onlinePlayer1FieldContainer {
+#onlinePlayer1FieldContainer,
+#gameInfoContainer {
   grid-area: player1;
 }
 
-#onlinePlayer3FieldContainer {
+#onlinePlayer3FieldContainer,
+#botFieldContainer {
   grid-area: player3;
 }
 
@@ -425,7 +438,7 @@ body, html {
   position: relative;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  background: radial-gradient(circle,@light2 50%, transparent 100%);
+  background: radial-gradient(circle, @light2 50%, transparent 100%);
   z-index: 1;
 }
 
@@ -433,15 +446,19 @@ body, html {
 .coinButton1 {
   background-color: black;
 }
+
 .coinButton2 {
   background-color: red;
 }
+
 .coinButton3 {
   background-color: green;
 }
+
 .coinButton4 {
   background-color: blue;
 }
+
 .coinButton5 {
   background-color: darkviolet;
 }
@@ -459,33 +476,31 @@ body, html {
   left: -2px;
   width: calc(100% + 4px);
   height: calc(100% + 4px);
-  background: conic-gradient(
-         @light2 0deg,
-          transparent 15deg,
-         @light2 30deg,
-          transparent 45deg,
-         @light2 60deg,
-          transparent 75deg,
-         @light2 90deg,
-          transparent 105deg,
-         @light2 120deg,
-          transparent 135deg,
-         @light2 150deg,
-          transparent 165deg,
-         @light2 180deg,
-          transparent 195deg,
-         @light2 210deg,
-          transparent 225deg,
-         @light2 240deg,
-          transparent 255deg,
-         @light2 270deg,
-          transparent 285deg,
-         @light2 300deg,
-          transparent 315deg,
-         @light2 330deg,
-          transparent 345deg,
-         @light2 360deg
-  );
+  background: conic-gradient(@light2 0deg,
+  transparent 15deg,
+  @light2 30deg,
+  transparent 45deg,
+  @light2 60deg,
+  transparent 75deg,
+  @light2 90deg,
+  transparent 105deg,
+  @light2 120deg,
+  transparent 135deg,
+  @light2 150deg,
+  transparent 165deg,
+  @light2 180deg,
+  transparent 195deg,
+  @light2 210deg,
+  transparent 225deg,
+  @light2 240deg,
+  transparent 255deg,
+  @light2 270deg,
+  transparent 285deg,
+  @light2 300deg,
+  transparent 315deg,
+  @light2 330deg,
+  transparent 345deg,
+  @light2 360deg);
   z-index: -1;
 }
 
@@ -523,4 +538,142 @@ body, html {
   justify-content: center;
   align-items: center;
   position: absolute;
+}
+
+//TODO: del after practice styling is done
+#nameInputContainer {
+  visibility: hidden;
+}
+
+#practiceTableContainer {
+  visibility: visible;
+}
+
+//practice table styling
+#practiceTableContainer {
+  display: grid;
+  grid-template-areas:
+        "stats table player3"
+        "stats player2 x2";
+  grid-template-rows: 75% 25%;
+  grid-template-columns: 20% 70% 10%;
+  width: 100vw;
+  height: 100vh;
+  border: 2px;
+  color: @light1;
+}
+
+#practiceTableFieldContainer {
+  grid-area: table;
+  display: grid;
+  grid-template-areas:
+        "x croupier player3"
+        "x info player3"
+        "x player2 player3";
+  grid-template-rows: 30% 40% 30%;
+  grid-template-columns:20% 60% 20%;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  border: 20px solid @dark2;
+  border-radius: 20px;
+  overflow: hidden;
+  background-image: url('/src/assets/images/BJMBannerWide.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#gameInfoContainer {
+    grid-area: stats;
+  display: grid;
+  grid-template-areas:
+        "stats houseE";
+  grid-template-columns: 80% 25%;
+  margin: 10px;
+}
+
+#houseEdgeContainer {
+  grid-area: houseE;
+  grid-template-areas:
+        "H"
+        "Indicator"
+        "P";
+  grid-template-rows: 5% 90% 5%;
+  display: grid;
+  width: 100%;
+  padding-right: 5px;
+}
+
+#houseEdgeH {
+  grid-area: H;
+  font-size: 10px;
+  font-weight: bold;
+  color: @light2;
+  text-align: center;
+}
+
+#houseEdgeP {
+  grid-area: P;
+  font-size: 10px;
+  font-weight: bold;
+  color: @light2;
+  text-align: center;
+}
+
+#houseEdgeIndicator {
+  grid-area: Indicator;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: @light2;
+}
+
+#indicatorTop {
+  background-color: @dark2;
+  width: 50%;
+  transition: height 0.3s ease;
+}
+
+#indicatorBottom {
+  background-color: @light2;
+  width: 50%;
+  transition: height 0.3s ease;
+}
+
+#otherStatsContainer {
+  grid-area: stats;
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 15%;
+}
+
+.statValue {
+  display: flex;
+  justify-content: right;
+  font-size: 20px;
+  font-weight: bold;
+  color: @light2;
+  padding-right: 10px;
+}
+
+.statDescription {
+  justify-content: left;
+  font-size: 20px;
+  font-weight: bold;
+  color: @light2;
+  padding-left: 10px;
+}
+
+.valueContainer {
+  display: grid;
+  grid: "x y";
+  font-size: 20px;
+  font-weight: bold;
+  color: @light2;
+  border-right: 5px solid @accent;
+  width: 100%;
 }

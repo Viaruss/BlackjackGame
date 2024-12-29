@@ -3,14 +3,13 @@ package com.Viarus.BlackjackGame.Game.PracticeTable;
 import com.Viarus.BlackjackGame.Cards.Deck;
 import com.Viarus.BlackjackGame.Game.Croupier.Croupier;
 import com.Viarus.BlackjackGame.Game.Player.Player;
+import com.Viarus.BlackjackGame.Game.PracticeTable.Utils.BotPlayer;
 import com.Viarus.BlackjackGame.Game.Table.Utils.GameState;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.ArrayList;
 
 @Document
 @Getter
@@ -19,15 +18,25 @@ public class PracticeTable {
     @Id
     @Setter(AccessLevel.NONE)
     String id;
-    ArrayList<Player> players;
 
+    Player player;
+    BotPlayer botPlayer;
+    Croupier croupier;
 
-    private Croupier croupier;
     private Deck cardsInPlay;
     private GameState gameState;
     private int turnNumber;
+
     private int countdownTime;
     private String stateMessage;
+
+    //game stats
+    int runningValue;
+    int trueValue;
+    double houseEdge;
+    int totalCards;
+    int cardsLeft;
+    int cardsDealt;
 
     //TODO: Add loading from properties (might be possible to do it in a constructor when creating new table - verify)
     private int maxPlayers = 3;
@@ -35,47 +44,35 @@ public class PracticeTable {
     private int blackJackMultiplier = 3;
 
     public PracticeTable() {
-        this.players = new ArrayList<>();
-        for (int i = 0; i < maxPlayers; i++) players.add(null);
+        this.player = null;
         this.croupier = new Croupier();
         this.cardsInPlay = new Deck(decksCount);
         this.gameState = GameState.WAITING_FOR_PLAYERS;
         this.countdownTime = 0;
         this.stateMessage = "";
+        this.runningValue = 0;
+        this.trueValue = 0;
+        this.houseEdge = 0.5;
+        this.totalCards = cardsInPlay.getCards().size();
+        this.cardsLeft = totalCards;
+        this.cardsDealt = 0;
     }
 
-    public void addPlayer(Player player) throws Exception {
-        if (this.players.contains(null)) {
-            this.players.set(this.players.indexOf(null), player);
-        } else {
-            throw new Exception("Table is already full");
-        }
+    public PracticeTable(Player player) {
+        this.player = player;
+        this.croupier = new Croupier();
+        this.cardsInPlay = new Deck(decksCount);
+        this.gameState = GameState.WAITING_FOR_PLAYERS;
+        this.stateMessage = "";
+        this.runningValue = 0;
+        this.trueValue = 0;
+        this.houseEdge = 0.5;
+        this.totalCards = cardsInPlay.getCards().size();
+        this.cardsLeft = totalCards;
+        this.cardsDealt = 0;
     }
-
-    public void removePlayer(Player player) {
-        int playerIndex = this.players.indexOf(player);
-        this.players.set(playerIndex, null);
-    }
-
 
     public void updatePlayer(Player updatedPlayer) {
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).getId().equals(updatedPlayer.getId())) {
-                players.set(i, updatedPlayer);
-                break;
-            }
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Table{" +
-                "id='" + id + '\'' +
-                ", players=" + players +
-                ", maxPlayers=" + maxPlayers +
-                ", decksCount=" + decksCount +
-                ", croupier=" + croupier +
-                ", cardsInPlay=" + cardsInPlay +
-                '}';
+        this.player = updatedPlayer;
     }
 }
