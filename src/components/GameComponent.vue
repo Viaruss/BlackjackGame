@@ -194,27 +194,26 @@
         <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
         <div id="infoAndTimerContainer" class="infoField">
           <div id="timerStateMessage"></div>
-          <div id="timerCountdownField">0</div>
+          <div id="timerCountdownField"></div>
         </div>
         <div id="localPlayerCardsField" class="tableCardsField">player2CardsField</div>
         <div id="botCardsField" class="tableCardsField">player3CardsField</div>
       </div>
-      <div id="botFieldContainer">
-        <div id="botName">Empty</div>
-        <div id="botBalance">Balance:</div>
-        <div id="botBet">Bet:</div>
+      <div id="botFieldContainer" v-if="this.practiceTable && this.practiceTable.botPlayer">
+        <div id="botName">{{this.practiceTable.botPlayer.name || "Unknown"}}</div>
+        <div id="botBalance">Balance: {{this.practiceTable.botPlayer.balance || 0}}</div>
+        <div id="botBet">Bet: {{this.practiceTable.botPlayer.bet || 0 }}</div>
       </div>
-
-      <div id="onlinePlayer2FieldContainer">
-        <div id="onlinePlayer2InfoFieldContainer">
-          <div id="onlinePlayer2InformationContainer">
-            <div id="onlinePlayer2Balance"></div>
-            <div id="onlinePlayer2Name"></div>
-            <div id="onlinePlayer2Bet"></div>
+      <div id="localPlayerFieldContainer">
+        <div id="localPlayerInfoFieldContainer">
+          <div id="localPlayerInformationContainer" v-if="this.player">
+            <div id="localPlayerBalance">Balance: {{this.player.learningBalance || 0}}</div>
+            <div id="localPlayerName">{{ this.player.name || 'Unknown' }}</div>
+            <div id="localPlayerBet">Bet: {{ this.player.bet || 0 }}</div>
           </div>
         </div>
-        <div id="onlinePlayer2ControlsFieldContainer">
-          <div id="onlinePlayer2BetsPanelContainer" v-if="this.player && this.player.currentAction === 'BETTING'">
+        <div id="localPlayerControlsFieldContainer">
+          <div id="localPlayerBetsPanelContainer" v-if="this.player && this.player.currentAction === 'BETTING'">
             <div id="betsControlAmountContainer">
               Amount: {{ this.playerBetCount }}
             </div>
@@ -228,11 +227,11 @@
               </button>
               <button id="betsControlsCoin100" class="coinButton coinButton5" @click="this.playerBetCount += 100">100
               </button>
-              <button id="betsControlPlaceButton" class="button" @click="placeBet">Place Bet</button>
+              <button id="betsControlPlaceButton" class="button" @click="placePracticeBet">Place Bet</button>
               <button id="betsControlPlaceButton" class="button" @click="this.playerBetCount = 0">Reset</button>
             </div>
           </div>
-          <div id="onlinePlayer2ActionsPanelContainer" v-if="this.player && this.player.currentAction === 'DECIDING'">
+          <div id="localPlayerActionsPanelContainer" v-if="this.player && this.player.currentAction === 'DECIDING'">
             <button
                 v-for="decision in this.player.availableDecisions"
                 :key="decision"
@@ -307,22 +306,22 @@ export default {
       return this.practiceTable ? this.practiceTable.trueValue : 0;
     },
     cardsInPlay() {
-      return this.practiceTable ? this.practiceTable.cardsInPlay : 0;
+      return this.practiceTable ? this.practiceTable.totalCards : 0;
     },
     cardsPlayed() {
-      return this.practiceTable ? this.practiceTable.cardsPlayed : 0;
+      return this.practiceTable ? this.practiceTable.cardsDealt : 0;
     },
     cardsLeft() {
-      return this.practiceTable ? this.practiceTable.cardsInPlay - this.practiceTable.cardsPlayed : 0;
+      return this.practiceTable ? this.practiceTable.cardsLeft : 0;
     },
     croupierValue() {
-      return this.practiceTable ? this.practiceTable.croupierValue : 0;
+      return this.practiceTable ? (this.practiceTable.croupierValue ? this.practiceTable.croupierValue : 0): 0;
     },
     playerValue() {
-      return this.practiceTable ? this.practiceTable.playerValue : 0;
+      return this.practiceTable ? (this.practiceTable.playerValue ? this.practiceTable.playerValue : 0) : 0;
     },
     botValue() {
-      return this.practiceTable ? this.practiceTable.botValue : 0;
+      return this.practiceTable ? (this.practiceTable.botValue ? this.practiceTable.botValue : 0) : 0;
     },
   },
 
@@ -361,7 +360,6 @@ export default {
         } else {
           document.getElementById('nameNotFoundContainer').style.visibility = 'visible';
           document.getElementById('nameInputContainer').style.visibility = 'hidden';
-
         }
       } catch (error) {
         console.error('Error fetching player:', error);
@@ -385,9 +383,8 @@ export default {
         console.error('Error creating player:', error);
       }
     },
-    selectLearnMode() {
-      document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
-      document.getElementById('practiceTableContainer').style.visibility = 'visible';
+    async selectLearnMode() {
+      await this.joinPracticeTable();
     },
 
     async selectOnlineMode() {
@@ -431,6 +428,27 @@ export default {
       }
     },
 
+    async joinPracticeTable() {
+      try {
+        console.log("trying to join a practice table")
+        const response = await fetch(`/api/v1/practiceTable/join?playerId=${this.player.id}`, {method: 'PUT'});
+        if (response.ok) {
+          this.practiceTable = await response.json();
+          this.connectToPracticeSocket(this.practiceTable.id)
+          console.log('Joined table:', this.practiceTable);
+          this.updatePracticeTable();
+          document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
+          document.getElementById('practiceTableContainer').style.visibility = 'visible';
+        } else {
+          const info = await response.text();
+          alert(info)
+          console.error('Error joining table: ', info);
+        }
+      } catch (error) {
+        console.error('Error joining table: ', error.toString());
+      }
+    },
+
     connectToSocket(tableId) {
       const socket = new SockJS("http://localhost:8080/api/v1/table/connections");
 
@@ -448,6 +466,30 @@ export default {
         this.stompClient.subscribe(`/topic/table/${tableId}`, (response) => {
           this.table = JSON.parse(response.body);
           this.updateTable();
+        });
+      };
+
+      this.stompClient.activate();
+    },
+
+    connectToPracticeSocket(tableId) {
+      const socket = new SockJS("http://localhost:8080/api/v1/table/connections");
+
+      this.stompClient = new Client({
+        webSocketFactory: () => socket,
+        debug: (str) => console.log(str),
+        reconnectDelay: 5000,
+        heartbeatIncoming: 2000,
+        heartbeatOutgoing: 2000,
+      });
+
+      this.stompClient.onConnect = () => {
+        console.log("Connected to WebSocket");
+
+        this.stompClient.subscribe(`/topic/practiceTable/${tableId}`, (response) => {
+          this.practiceTable = JSON.parse(response.body);
+          console.log("Received practice table update: ", this.practiceTable);
+          this.updatePracticeTable();
         });
       };
 
@@ -510,6 +552,22 @@ export default {
       this.renderPlayerCards(otherPlayers[1], "player3CardsField");
     },
 
+    renderAllPracticeCards() {
+      const croupierContainer = document.getElementById("croupierCardsField");
+      if (croupierContainer) {
+        croupierContainer.innerHTML = "";
+        if (this.practiceTable && this.practiceTable.croupier && this.practiceTable.croupier.hand.cards) {
+          this.practiceTable.croupier.hand.cards.forEach((card, index) => {
+            const cardImg = this.createCardElement(card, index);
+            croupierContainer.appendChild(cardImg);
+          });
+        }
+      }
+
+      this.renderPlayerCards(this.player, "localPlayerCardsField");
+      this.renderPlayerCards(this.practiceTable.botPlayer, "botFieldContainer");
+    },
+
     updateTable() {
       if (!this.table || !this.player) {
         console.error('Table or player is not defined.');
@@ -538,13 +596,43 @@ export default {
       this.renderAllCards();
     },
 
+    updatePracticeTable() {
+      if (!this.practiceTable || !this.player) {
+        console.error('Table or player is not defined.');
+        return;
+      }
+      this.player = this.practiceTable.player || this.player;
+
+
+      // TODO: implement seat and info mapping
+
+      // document.getElementById("localPlayerName").innerText = this.player.name || 'Unknown';
+      // document.getElementById("localPlayerBalance").innerText = `Balance: ${this.player.learningBalance || 0}`;
+      // document.getElementById("localPlayerBet").innerText = `Bet: ${this.player.bet || 0}`;
+
+
+
+      // TODO: implement
+      this.updatePracticeTimerField();
+      this.renderAllPracticeCards();
+    },
+
     async leaveTable() {
-      if (!this.table || !this.player) {
+      if (!(this.table || this.practiceTable) || !this.player) {
         console.warn("Cannot leave table: Table or player is not defined.");
         return;
       }
 
-      const endpointUrl = `/api/v1/table/leave/${this.table.id}`;
+      let endpointUrl;
+
+      if (this.table) {
+        console.log("Leaving table: ", this.table);
+        endpointUrl = `/api/v1/table/leave/${this.table.id}`;
+      } else {
+        console.log("Leaving practice table: ", this.practiceTable);
+        endpointUrl = `/api/v1/practiceTable/leave/${this.practiceTable.id}`;
+
+      }
       const queryParams = `?playerId=${this.player.id}`;
 
       try {
@@ -631,6 +719,52 @@ export default {
       console.log("time: ", this.table.countdownTime);
       const countdownTime = this.table?.countdownTime || 0;
       const message = this.table.stateMessage;
+
+      if (countdownTime === 0) {
+        console.error("Countdown time is 0 or invalid. Timer won't start.");
+        document.getElementById("infoAndTimerContainer").style.visibility = "hidden";
+        return;
+      }
+
+      this.$nextTick(() => {
+        const timerField = document.getElementById("timerCountdownField");
+        const infoField = document.getElementById("timerStateMessage");
+
+        if (!timerField) {
+          console.error("Timer field not found!");
+          return;
+        }
+
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval);
+        }
+        document.getElementById("infoAndTimerContainer").style.visibility = "visible";
+        timerField.innerText = `${countdownTime}s`;
+        infoField.innerText = message;
+
+        let remainingTime = countdownTime;
+        this.timerInterval = setInterval(() => {
+          remainingTime--;
+          const countdownElement = document.getElementById("timerCountdownField");
+
+          if (countdownElement) {
+            countdownElement.innerText = `${remainingTime}s`;
+          }
+
+          if (remainingTime <= 0) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+            this.handleTimerEnd();
+          }
+        }, 1000);
+      });
+    },
+
+    updatePracticeTimerField() {
+      console.log("Updating timer field... table:", this.practiceTable);
+      console.log("time: ", this.practiceTable.countdownTime);
+      const countdownTime = this.practiceTable?.countdownTime || 0;
+      const message = this.practiceTable.stateMessage;
 
       if (countdownTime === 0) {
         console.error("Countdown time is 0 or invalid. Timer won't start.");

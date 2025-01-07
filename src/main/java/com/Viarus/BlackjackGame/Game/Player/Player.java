@@ -20,7 +20,8 @@ public class Player {
     @Id
     @Setter(lombok.AccessLevel.NONE)
     String id;
-    private String currentTableId;
+
+    public String currentTableId;
     String name;
 
     int balance;
@@ -77,6 +78,7 @@ public class Player {
                 ", currentTableId='" + currentTableId + '\'' +
                 ", name='" + name + '\'' +
                 ", balance=" + balance +
+                ", learningBalance=" + learningBalance +
                 ", totalWinnings=" + totalWinnings +
                 ", totalLosings=" + totalLosings +
                 ", currentAction=" + currentAction +

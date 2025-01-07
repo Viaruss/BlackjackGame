@@ -39,7 +39,7 @@ public class PracticeGameStateManager {
 
     public void notifyClients(String tableId) {
         PracticeTable table = practiceTableService.getTable(tableId);
-        simpMessagingTemplate.convertAndSend("/topic/table/" + tableId, table);
+        simpMessagingTemplate.convertAndSend("/topic/practiceTable/" + tableId, table);
     }
 
     public synchronized void scheduleStateChange(String tableId, GameState newState, long delayInSeconds) {

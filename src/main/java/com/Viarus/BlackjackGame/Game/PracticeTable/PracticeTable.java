@@ -46,6 +46,7 @@ public class PracticeTable {
     public PracticeTable() {
         this.player = null;
         this.croupier = new Croupier();
+        this.botPlayer = new BotPlayer();
         this.cardsInPlay = new Deck(decksCount);
         this.gameState = GameState.WAITING_FOR_PLAYERS;
         this.countdownTime = 0;
@@ -58,21 +59,31 @@ public class PracticeTable {
         this.cardsDealt = 0;
     }
 
-    public PracticeTable(Player player) {
-        this.player = player;
-        this.croupier = new Croupier();
-        this.cardsInPlay = new Deck(decksCount);
-        this.gameState = GameState.WAITING_FOR_PLAYERS;
-        this.stateMessage = "";
-        this.runningValue = 0;
-        this.trueValue = 0;
-        this.houseEdge = 0.5;
-        this.totalCards = cardsInPlay.getCards().size();
-        this.cardsLeft = totalCards;
-        this.cardsDealt = 0;
-    }
-
     public void updatePlayer(Player updatedPlayer) {
         this.player = updatedPlayer;
+    }
+
+    @Override
+    public String toString() {
+        return "PracticeTable{" +
+                "id='" + id + '\'' +
+                ", player=" + player +
+                ", botPlayer=" + botPlayer +
+                ", croupier=" + croupier +
+                ", cardsInPlay=" + cardsInPlay +
+                ", gameState=" + gameState +
+                ", turnNumber=" + turnNumber +
+                ", countdownTime=" + countdownTime +
+                ", stateMessage='" + stateMessage + '\'' +
+                ", runningValue=" + runningValue +
+                ", trueValue=" + trueValue +
+                ", houseEdge=" + houseEdge +
+                ", totalCards=" + totalCards +
+                ", cardsLeft=" + cardsLeft +
+                ", cardsDealt=" + cardsDealt +
+                ", maxPlayers=" + maxPlayers +
+                ", decksCount=" + decksCount +
+                ", blackJackMultiplier=" + blackJackMultiplier +
+                '}';
     }
 }

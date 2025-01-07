@@ -12,10 +12,11 @@ import com.Viarus.BlackjackGame.Game.Table.Utils.GameState;
 import com.Viarus.BlackjackGame.config.GameTimingConfig;
 import com.Viarus.BlackjackGame.config.GameplayConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.NoSuchElementException;
 
 import static com.Viarus.BlackjackGame.Game.Table.Utils.GameState.*;
 
@@ -28,13 +29,12 @@ public class PracticeTableService {
     public final GameTimingConfig gameTimingConfig;
     public final PracticeGameStateManager practiceGameStateManager;
     public final GameplayConfig gameplayConfig;
-
     public PracticeTableService(PracticeTableDAO practiceTableDAO,
                                 PlayerService playerService,
                                 PlayerDAO playerDAO,
                                 PracticeGameStateManager practiceGameStateManager,
                                 GameTimingConfig gameTimingConfig,
-                                GameplayConfig gameplayConfig) {
+                                GameplayConfig gameplayConfig, SpringDataWebAutoConfiguration springDataWebAutoConfiguration) {
         this.practiceTableDAO = practiceTableDAO;
         this.playerService = playerService;
         this.playerDAO = playerDAO;
@@ -49,31 +49,40 @@ public class PracticeTableService {
 
     public PracticeTable joinTable(String playerId) throws Exception {
         Player player = playerService.getPlayerById(playerId);
-        if (Objects.equals(player.getCurrentTableId(), null)) {
-            PracticeTable table = new PracticeTable(player);
-            player.setCurrentTableId(table.getId());
+        PracticeTable table;
+        if (player.getCurrentTableId() == null) {
+            // TODO: check if any existing table has player with this id
+            table = new PracticeTable();
+            table.setPlayer(player);
             player.setCurrentAction(PlayerActions.WAITING);
             table.setStateMessage("Preparing Table");
             table.setCountdownTime(gameTimingConfig.initialWaiting);
-            playerDAO.save(player);
+            table.updatePlayer(player);
             practiceTableDAO.save(table);
+            System.out.println("joining table " + table.getId());
+            player.currentTableId = table.getId();
+            System.out.println("player current table id " + player.currentTableId);
+            playerDAO.save(player);
+            System.out.println("after saving - player current table id " + player.currentTableId);
             practiceGameStateManager.notifyClients(table.getId());
             practiceGameStateManager.scheduleStateChange(table.id, BETTING, gameTimingConfig.initialWaiting);
-            return table;
+        } else if (practiceTableDAO.findById(player.getCurrentTableId()).isPresent()) {
+            table = practiceTableDAO.findById(player.getCurrentTableId()).get();
         } else {
+            System.out.println("error - Player is already at another table");
             throw new Exception("Player is already at another table");
         }
+        return table;
     }
 
-    public PracticeTable leaveTable(String playerId) {
-        Player player = playerService.getPlayerById(playerId);
-        PracticeTable table = practiceTableDAO.findById(player.getCurrentTableId()).orElse(null);
-        if (table == null) {
-            return null;
-        }
+    public PracticeTable leaveTable(String tableId) throws NoSuchElementException {
+        PracticeTable table = practiceTableDAO.findById(tableId).orElseThrow();
+        Player player = table.player;
+
         practiceGameStateManager.cancelScheduledTask();
         player.leaveTable();
 
+        System.out.println("leaving table " + table.getId());
         practiceTableDAO.delete(table);
         playerDAO.save(player);
 
