@@ -1,5 +1,6 @@
 package com.Viarus.BlackjackGame.Game.Player;
 
+import com.Viarus.BlackjackGame.Game.PracticeTable.PracticeTable;
 import com.Viarus.BlackjackGame.Game.Table.Table;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,19 @@ public class PlayerController {
         try {
             Table table = playerService.makeMove(tableId, playerId, playerDecision);
             simpMessagingTemplate.convertAndSend("/topic/table/" + table.getId(), table);
+            return ResponseEntity.ok(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/practice/{tableId}/makeMove")
+    public ResponseEntity<Object> playerPracticeMove(@PathVariable String tableId,
+                                             @RequestParam String playerDecision) {
+        try {
+            PracticeTable table = playerService.makePracticeMove(tableId, playerDecision);
+            simpMessagingTemplate.convertAndSend("/topic/practiceTable/" + table.getId(), table);
             return ResponseEntity.ok(table);
         } catch (Exception e) {
             return ResponseEntity.badRequest()

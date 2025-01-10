@@ -6,5 +6,6 @@ public enum GameState {
     PLAYING,
     NEXT_TURN,
     CROUPIER_TURN,
+    BOT_TURN,
     ROUND_SUMMARY
 }

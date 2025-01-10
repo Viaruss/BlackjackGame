@@ -52,15 +52,26 @@ public class Player {
         this.lastRoundResult = PlayerRoundResult.DRAW;
     }
 
-    public void placeBet(int amount) {
-        if (amount <= balance) {
-            balance -= amount;
-            bet += amount;
+    public void placeBet(int amount, boolean isLearning) {
+        if (isLearning){
+            if (amount <= learningBalance) {
+                learningBalance -= amount;
+                bet += amount;
+            }
+        } else {
+            if (amount <= balance) {
+                balance -= amount;
+                bet += amount;
+            }
         }
     }
 
     public void addBalance(int value) {
         balance += value;
+    }
+
+    public void addPracticeBalance(int value) {
+        learningBalance += value;
     }
 
     public void addWinnings(int value) {

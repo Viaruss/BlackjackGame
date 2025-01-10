@@ -143,6 +143,7 @@ public class TableService {
             case CROUPIER_TURN -> croupierTurn(table);
             case ROUND_SUMMARY -> roundResult(table);
             case WAITING_FOR_PLAYERS -> prepareGame(table);
+            default -> throw new Exception("Invalid game state");
         };
         tableDAO.save(updatedTable);
         gameStateManager.notifyClients(table.getId());
@@ -283,7 +284,7 @@ public class TableService {
                     nextTurn(table);
                 }
                 case DOUBLE -> {
-                    player.placeBet(player.getBet());
+                    player.placeBet(player.getBet(), false);
                     player.getHand().addCard(table.getCardsInPlay().dealCard());
                     player.setCurrentAction(PlayerActions.WAITING);
                     nextTurn(table);

@@ -13,7 +13,9 @@ public class GameTimingConfig {
     public int initialWaiting;
     public int betting;
     public int turnDelay;
+    public int practiceTurnDelay;
     public int croupierDelay;
+    public int botDelay;
     public int summaryDelay;
     public int postGameWaiting;
 }

@@ -2,21 +2,17 @@ package com.Viarus.BlackjackGame.Cards;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-@Document
 @Getter
 @Setter
 public class Deck {
-    @Id
-    @Setter(lombok.AccessLevel.NONE)
-    String id;
-
     private ArrayList<Card> cards;
+    private int cardsLeft;
+    private int cardsDealt;
+
     public Deck(){
         //Default deck
         this.cards = new ArrayList<>();
@@ -27,6 +23,8 @@ public class Deck {
                 cards.add(new Card(suit, rank));
             }
         }
+        this.cardsLeft = cards.size();
+        this.cardsDealt = 0;
         Deck.shuffleDeck(this);
     }
 
@@ -42,6 +40,8 @@ public class Deck {
                 }
             }
         }
+        this.cardsLeft = cards.size();
+        this.cardsDealt = 0;
         Deck.shuffleDeck(this);
     }
 
@@ -52,6 +52,8 @@ public class Deck {
     public Card dealCard(){
         Card cardToDeal = this.cards.get(this.cards.size()-1);
         this.cards.remove(this.cards.size()-1);
+        this.cardsDealt++;
+        this.cardsLeft--;
         return cardToDeal;
     }
 

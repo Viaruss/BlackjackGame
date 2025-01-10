@@ -75,14 +75,14 @@
         <div id="onlinePlayer1Bet">Bet:</div>
       </div>
       <div id="onlineTableFieldContainer">
-        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
+        <div id="croupierCardsField" class="tableCardsField"></div>
         <div id="infoAndTimerContainer" class="infoField">
           <div id="timerStateMessage"></div>
           <div id="timerCountdownField">0</div>
         </div>
-        <div id="player1CardsField" class="tableCardsField">player1CardsField</div>
-        <div id="player2CardsField" class="tableCardsField">player2CardsField</div>
-        <div id="player3CardsField" class="tableCardsField">player3CardsField</div>
+        <div id="player1CardsField" class="tableCardsField"></div>
+        <div id="player2CardsField" class="tableCardsField"></div>
+        <div id="player3CardsField" class="tableCardsField"></div>
       </div>
       <div id="onlinePlayer3FieldContainer">
         <div id="onlinePlayer3Name">Empty</div>
@@ -151,6 +151,7 @@
                 id="indicatorTop"
                 :style="{ height: indicatorTopHeight + '%' }"
             ></div>
+            <div id="middleLine"></div>
             <div
                 id="indicatorBottom"
                 :style="{ height: indicatorBottomHeight + '%' }"
@@ -168,6 +169,7 @@
           <span class="valueContainer">
             <span class="statDescription">House Edge: </span><span class="statValue">{{ houseEdge }}%</span>
           </span>
+          <span class="sectionBreak"></span>
 
           <span class="valueContainer">
             <span class="statDescription">Cards in play: </span><span class="statValue">{{ cardsInPlay }}</span>
@@ -178,36 +180,57 @@
           <span class="valueContainer">
             <span class="statDescription">Cards left: </span><span class="statValue">{{ cardsLeft }}</span>
           </span>
+          <span class="sectionBreak"></span>
 
           <span class="valueContainer">
-            <span class="statDescription">Croupier: </span><span class="statValue">{{ croupierValue }}</span>
+            <span class="statDescription">Croupier card value: </span><span class="statValue">{{ croupierValue }}</span>
           </span>
           <span class="valueContainer">
-            <span class="statDescription">You: </span><span class="statValue">{{ playerValue }}</span>
+            <span class="statDescription">Your card value: </span><span class="statValue">{{ playerValue }}</span>
           </span>
           <span class="valueContainer">
-          <span class="statDescription">Bot: </span><span class="statValue">{{ botValue }}</span>
+          <span class="statDescription">Bot card value: </span><span class="statValue">{{ botValue }}</span>
+          </span>
+          <span class="sectionBreak"></span>
+
+          <span class="valueContainer">
+          <span class="statDescription">Your profit: </span><span class="statValue">{{ playerProfit }}</span>
+          </span>
+          <span class="valueContainer">
+          <span class="statDescription">Bot profit: </span><span class="statValue">{{ botProfit }}</span>
           </span>
         </div>
       </div>
       <div id="practiceTableFieldContainer">
-        <div id="croupierCardsField" class="tableCardsField">croupierCardsField</div>
-        <div id="infoAndTimerContainer" class="infoField">
-          <div id="timerStateMessage"></div>
-          <div id="timerCountdownField"></div>
+        <div id="practiceCroupierCardsField" class="tableCardsField"></div>
+        <div id="practiceInfoAndTimerContainer" class="infoField">
+          <div id="practiceTimerStateMessage"></div>
+          <div id="practiceTimerCountdownField"></div>
         </div>
-        <div id="localPlayerCardsField" class="tableCardsField">player2CardsField</div>
-        <div id="botCardsField" class="tableCardsField">player3CardsField</div>
+        <div id="localPlayerCardsField" class="tableCardsField"></div>
+        <div id="botCardsField" class="tableCardsField"></div>
       </div>
       <div id="botFieldContainer" v-if="this.practiceTable && this.practiceTable.botPlayer">
-        <div id="botName">{{this.practiceTable.botPlayer.name || "Unknown"}}</div>
-        <div id="botBalance">Balance: {{this.practiceTable.botPlayer.balance || 0}}</div>
-        <div id="botBet">Bet: {{this.practiceTable.botPlayer.bet || 0 }}</div>
+        <div id="botInfoContainer">
+          <div id="botName">{{ this.practiceTable.botPlayer.name || "Unknown" }}</div>
+          <div id="botBalance">Balance: {{ this.practiceTable.botPlayer.balance || 0 }}</div>
+          <div id="botBet">Bet: {{ this.practiceTable.botPlayer.bet || 0 }}</div>
+        </div>
+        <div id="botDecisionsContainer">
+          <span id="botDecisionsTitle">Decisions:</span>
+          <div v-if="this.practiceTable.botPlayer.lastDecisions && this.practiceTable.botPlayer.lastDecisions.length > 0">
+            <ul id="botDecisionsList">
+              <li v-for="(decision, index) in this.practiceTable.botPlayer.lastDecisions" :key="index">
+                {{ decision }}
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div id="localPlayerFieldContainer">
         <div id="localPlayerInfoFieldContainer">
           <div id="localPlayerInformationContainer" v-if="this.player">
-            <div id="localPlayerBalance">Balance: {{this.player.learningBalance || 0}}</div>
+            <div id="localPlayerBalance">Balance: {{ this.player.learningBalance || 0 }}</div>
             <div id="localPlayerName">{{ this.player.name || 'Unknown' }}</div>
             <div id="localPlayerBet">Bet: {{ this.player.bet || 0 }}</div>
           </div>
@@ -236,13 +259,13 @@
                 v-for="decision in this.player.availableDecisions"
                 :key="decision"
                 class="button"
-                @click="makeMove(decision)">
+                @click="practiceMakeMove(decision)">
               {{ decision }}
             </button>
           </div>
           <div
-              id="resultField"
-              v-if="this.table && this.table.gameState === 'ROUND_SUMMARY'"
+              id="practiceResultField"
+              v-if="this.practiceTable && this.practiceTable.gameState === 'ROUND_SUMMARY'"
           >
             {{
               this.player.lastRoundResult === 'WON' ? 'You WON!' :
@@ -291,37 +314,47 @@ export default {
 
   computed: {
     indicatorTopHeight() {
-      return this.practiceTable ? 50 + this.practiceTable.houseEdge * 50 : 50;
+      return this.practiceTable
+          ? 50 + ((this.practiceTable.houseEdge / 3) * 50)
+          : 50;
     },
     indicatorBottomHeight() {
-      return this.practiceTable ? 50 - this.practiceTable.houseEdge * 50 : 50;
+      return this.practiceTable
+          ? 50 - ((this.practiceTable.houseEdge / 3) * 50)
+          : 50;
     },
     houseEdge() {
-      return this.practiceTable ? this.practiceTable.houseEdge : 0;
+      return this.practiceTable ? this.practiceTable.houseEdge.toFixed(2) : "0.00";
     },
     runningValue() {
       return this.practiceTable ? this.practiceTable.runningValue : 0;
     },
     trueValue() {
-      return this.practiceTable ? this.practiceTable.trueValue : 0;
+      return this.practiceTable ? this.practiceTable.trueValue.toFixed(2) : "0.00";
     },
     cardsInPlay() {
       return this.practiceTable ? this.practiceTable.totalCards : 0;
     },
     cardsPlayed() {
-      return this.practiceTable ? this.practiceTable.cardsDealt : 0;
+      return this.practiceTable ? this.practiceTable.cardsInPlay.cardsDealt : 0;
     },
     cardsLeft() {
-      return this.practiceTable ? this.practiceTable.cardsLeft : 0;
+      return this.practiceTable ? this.practiceTable.cardsInPlay.cardsLeft : 0;
     },
     croupierValue() {
-      return this.practiceTable ? (this.practiceTable.croupierValue ? this.practiceTable.croupierValue : 0): 0;
+      return this.practiceTable ? (this.practiceTable.croupierValue ? this.practiceTable.croupierValue : 0) : 0;
     },
     playerValue() {
       return this.practiceTable ? (this.practiceTable.playerValue ? this.practiceTable.playerValue : 0) : 0;
     },
     botValue() {
       return this.practiceTable ? (this.practiceTable.botValue ? this.practiceTable.botValue : 0) : 0;
+    },
+    playerProfit() {
+      return this.practiceTable ? (this.practiceTable.player.learningBalance - this.practiceTable.learningBalance) : 0;
+    },
+    botProfit() {
+      return this.practiceTable ? (this.practiceTable.botPlayer.balance - this.practiceTable.learningBalance) : 0;
     },
   },
 
@@ -415,9 +448,9 @@ export default {
           this.table = await response.json();
           this.connectToSocket(this.table.id)
           console.log('Joined table:', this.table);
-          this.updateTable();
           document.getElementById('joinGameContainer').style.visibility = 'hidden';
           document.getElementById('onlineTableContainer').style.visibility = 'visible';
+          this.updateTable();
         } else {
           const info = await response.text();
           alert(info)
@@ -508,6 +541,7 @@ export default {
 
     renderPlayerCards(player, containerId) {
       const container = document.getElementById(containerId);
+      console.log(player.hand.cards)
 
       if (container) container.innerHTML = "";
 
@@ -553,19 +587,9 @@ export default {
     },
 
     renderAllPracticeCards() {
-      const croupierContainer = document.getElementById("croupierCardsField");
-      if (croupierContainer) {
-        croupierContainer.innerHTML = "";
-        if (this.practiceTable && this.practiceTable.croupier && this.practiceTable.croupier.hand.cards) {
-          this.practiceTable.croupier.hand.cards.forEach((card, index) => {
-            const cardImg = this.createCardElement(card, index);
-            croupierContainer.appendChild(cardImg);
-          });
-        }
-      }
-
       this.renderPlayerCards(this.player, "localPlayerCardsField");
-      this.renderPlayerCards(this.practiceTable.botPlayer, "botFieldContainer");
+      this.renderPlayerCards(this.practiceTable.botPlayer, "botCardsField");
+      this.renderPlayerCards(this.practiceTable.croupier, "practiceCroupierCardsField");
     },
 
     updateTable() {
@@ -603,16 +627,6 @@ export default {
       }
       this.player = this.practiceTable.player || this.player;
 
-
-      // TODO: implement seat and info mapping
-
-      // document.getElementById("localPlayerName").innerText = this.player.name || 'Unknown';
-      // document.getElementById("localPlayerBalance").innerText = `Balance: ${this.player.learningBalance || 0}`;
-      // document.getElementById("localPlayerBet").innerText = `Bet: ${this.player.bet || 0}`;
-
-
-
-      // TODO: implement
       this.updatePracticeTimerField();
       this.renderAllPracticeCards();
     },
@@ -687,6 +701,24 @@ export default {
       }
     },
 
+    async placePracticeBet() {
+      try {
+        console.log("Placing bet " + this.playerBetCount)
+        const response = await fetch(`/api/v1/practiceTable/bet/${this.practiceTable.id}?playerId=${this.player.id}&amount=${this.playerBetCount}`, {method: 'PUT'});
+        if (response.ok) {
+          this.practiceTable = await response.json();
+          console.log(this.practiceTable);
+          this.playerBetCount = 0;
+        } else {
+          const info = await response.text();
+          alert(info);
+          console.error(info);
+        }
+      } catch (error) {
+        console.error('Error fetching tables: ', error);
+      }
+    },
+
     async makeMove(decision) {
       if (!this.table || !this.player) {
         console.error("Table or player is not defined.");
@@ -695,6 +727,33 @@ export default {
 
       const endpointUrl = `/api/v1/player/${this.table.id}/makeMove`;
       const queryParams = `?playerId=${this.player.id}&playerDecision=${decision}`;
+
+      try {
+        const response = await fetch(endpointUrl + queryParams, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          console.error(`Failed to make move '${decision}':`, errorMessage);
+          alert(`Failed to make move: ${errorMessage}`);
+        }
+      } catch (error) {
+        console.error(`Error while making move '${decision}':`, error);
+      }
+    },
+
+    async practiceMakeMove(decision) {
+      if (!this.practiceTable || !this.player) {
+        console.error("Table or player is not defined.");
+        return;
+      }
+
+      const endpointUrl = `/api/v1/player/practice/${this.practiceTable.id}/makeMove`;
+      const queryParams = `?playerDecision=${decision}`;
 
       try {
         const response = await fetch(endpointUrl + queryParams, {
@@ -768,13 +827,13 @@ export default {
 
       if (countdownTime === 0) {
         console.error("Countdown time is 0 or invalid. Timer won't start.");
-        document.getElementById("infoAndTimerContainer").style.visibility = "hidden";
+        document.getElementById("practiceInfoAndTimerContainer").style.visibility = "hidden";
         return;
       }
 
       this.$nextTick(() => {
-        const timerField = document.getElementById("timerCountdownField");
-        const infoField = document.getElementById("timerStateMessage");
+        const timerField = document.getElementById("practiceTimerCountdownField");
+        const infoField = document.getElementById("practiceTimerStateMessage");
 
         if (!timerField) {
           console.error("Timer field not found!");
@@ -784,14 +843,14 @@ export default {
         if (this.timerInterval) {
           clearInterval(this.timerInterval);
         }
-        document.getElementById("infoAndTimerContainer").style.visibility = "visible";
+        document.getElementById("practiceInfoAndTimerContainer").style.visibility = "visible";
         timerField.innerText = `${countdownTime}s`;
         infoField.innerText = message;
 
         let remainingTime = countdownTime;
         this.timerInterval = setInterval(() => {
           remainingTime--;
-          const countdownElement = document.getElementById("timerCountdownField");
+          const countdownElement = document.getElementById("practiceTimerCountdownField");
 
           if (countdownElement) {
             countdownElement.innerText = `${remainingTime}s`;
@@ -808,7 +867,7 @@ export default {
 
     handleTimerEnd() {
       console.log("Timer ended!");
-      document.getElementById("infoAndTimerContainer").style.visibility = "hidden";
+      document.getElementById("practiceInfoAndTimerContainer").style.visibility = "hidden";
     },
   },
 };

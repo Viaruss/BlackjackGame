@@ -112,6 +112,16 @@ body, html {
   visibility: hidden;
 }
 
+#gameModeMenuButtonsContainer {
+  min-height: 200px;
+  column-gap: 20px;
+}
+
+#practiceModeButton,
+#onlineModeButton {
+  min-height: 80px;
+}
+
 #nameInputField {
   color: @light2;
   background: @dark1;
@@ -203,12 +213,14 @@ body, html {
   background-repeat: no-repeat;
 }
 
-#croupierCardsField {
+#croupierCardsField,
+#practiceCroupierCardsField {
   grid-area: croupier;
   flex-direction: row;
 }
 
-#infoAndTimerContainer {
+#infoAndTimerContainer,
+#practiceInfoAndTimerContainer {
   grid-area: info;
   display: flex;
   flex-direction: column;
@@ -217,19 +229,21 @@ body, html {
 }
 
 #timerStateMessage,
-#practiceStateMessage {
+#practiceTimerStateMessage {
   font-size: 30px;
   color: @accent;
   text-shadow: 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 10px black;
 }
 
-#timerCountdownField {
+#timerCountdownField,
+#practiceTimerCountdownField {
   font-size: 120px;
   color: @accent;
   text-shadow: 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 20px black, 1px 1px 10px black;
 }
 
-#resultField {
+#resultField,
+#practiceResultField {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -286,7 +300,6 @@ body, html {
 }
 
 #onlinePlayer3FieldContainer,
-#botFieldContainer,
 #onlinePlayer1FieldContainer {
   display: inline-flex;
   flex-direction: column;
@@ -306,9 +319,12 @@ body, html {
 #botBet {
   border-left: 5px solid @accent;
   padding-left: 10px;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 #croupierCardsField .Card,
+#practiceCroupierCardsField .Card,
 #player2CardsField .Card,
 #localPlayerCardsField .Card {
   left: calc(50% - 40px);
@@ -330,6 +346,7 @@ body, html {
 }
 
 #croupierCardsField .Card:first-child,
+#practiceCroupierCardsField .Card:first-child,
 #player2CardsField .Card:first-child,
 #localPlayerCardsField .Card:first-child {
   margin-left: 0;
@@ -403,7 +420,7 @@ body, html {
 
 /* Bets Panel within Controls Container */
 #onlinePlayer2BetsPanelContainer,
-#localPlayerBetsPanelContainer{
+#localPlayerBetsPanelContainer {
   width: 100%;
   height: 100%;
   display: flex;
@@ -538,7 +555,8 @@ body, html {
 }
 
 /* Actions Panel within Controls Container */
-#onlinePlayer2ActionsPanelContainer {
+#onlinePlayer2ActionsPanelContainer,
+#localPlayerActionsPanelContainer {
   width: 100%;
   height: 100%;
   display: flex;
@@ -584,7 +602,7 @@ body, html {
 }
 
 #gameInfoContainer {
-    grid-area: stats;
+  grid-area: stats;
   display: grid;
   grid-template-areas:
         "stats houseE";
@@ -626,7 +644,7 @@ body, html {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: @light2;
+  position: relative;
 }
 
 #indicatorTop {
@@ -639,6 +657,16 @@ body, html {
   background-color: @light2;
   width: 50%;
   transition: height 0.3s ease;
+}
+
+#middleLine {
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background-color: @accent;
+  z-index: 1;
 }
 
 #otherStatsContainer {
@@ -674,4 +702,46 @@ body, html {
   color: @light2;
   border-right: 5px solid @accent;
   width: 100%;
+}
+
+.sectionBreak {
+  height: 20px;
+  border-right: 5px solid @accent;
+  width: 100%;
+}
+
+#botFieldContainer {
+  display: inline-grid;
+  justify-content: center;
+  align-items: start;
+  padding-left: 20px;
+}
+
+#botInfoContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+#botDecisionsContainer {
+  padding: 0 15px 5px;
+  width: 80%;
+}
+
+#botDecisionsTitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+#botDecisionsList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#botDecisionsList li {
+  list-style-type: disc;
+  font-size: 20px;
+  font-weight: bold;
 }
