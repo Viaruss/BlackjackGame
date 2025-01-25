@@ -133,7 +133,7 @@
                   this.player.lastRoundResult === 'LOST' ? 'You lost...' :
                       this.player.lastRoundResult === 'DRAW' ? 'It\'s a draw!' :
                           this.player.lastRoundResult === 'BLACKJACK' ? 'BLACKJACK!' :
-                              'Unknown result'
+                              ''
             }}
           </div>
         </div>
