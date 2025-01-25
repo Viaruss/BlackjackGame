@@ -1,7 +1,7 @@
 package com.Viarus.BlackjackGame.Game.PracticeTable;
 
-import com.Viarus.BlackjackGame.Cards.Card;
-import com.Viarus.BlackjackGame.Cards.Hand;
+import com.Viarus.BlackjackGame.Game.Cards.Card;
+import com.Viarus.BlackjackGame.Game.Cards.Hand;
 import com.Viarus.BlackjackGame.Game.Player.Player;
 import com.Viarus.BlackjackGame.Game.Player.PlayerDAO;
 import com.Viarus.BlackjackGame.Game.Player.PlayerService;
@@ -56,7 +56,6 @@ public class PracticeTableService {
         Player player = playerService.getPlayerById(playerId);
         PracticeTable table;
         if (player.getCurrentTableId() == null) {
-            // TODO: check if any existing table has player with this id
             table = new PracticeTable();
             player.setHand(new Hand());
             table.setPlayer(player);

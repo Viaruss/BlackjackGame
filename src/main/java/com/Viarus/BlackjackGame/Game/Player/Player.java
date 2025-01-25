@@ -1,6 +1,6 @@
 package com.Viarus.BlackjackGame.Game.Player;
 
-import com.Viarus.BlackjackGame.Cards.Hand;
+import com.Viarus.BlackjackGame.Game.Cards.Hand;
 import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerActions;
 import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerDecisions;
 import com.Viarus.BlackjackGame.Game.Player.Utils.PlayerRoundResult;
@@ -124,7 +124,6 @@ public class Player {
                 availableDecisions = List.of(PlayerDecisions.HIT, PlayerDecisions.STAND);
             }
         }
-
     }
 
     public void leaveTable() {

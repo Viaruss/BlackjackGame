@@ -1,6 +1,6 @@
 package com.Viarus.BlackjackGame.Game.PracticeTable.Utils;
 
-import com.Viarus.BlackjackGame.Cards.Card;
+import com.Viarus.BlackjackGame.Game.Cards.Card;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class CardCountingStrategy {
     }
 
     public static double calculateTrueValue(int runningValue, int cardsLeft) {
-        int remainingDecks = Math.max(cardsLeft / 52, 1); // Approximate remaining decks
+        int remainingDecks = Math.max(cardsLeft / 52, 1);
         return (double) runningValue / remainingDecks;
     }
 

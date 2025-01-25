@@ -1,7 +1,7 @@
 package com.Viarus.BlackjackGame.Game.PracticeTable;
 
-import com.Viarus.BlackjackGame.Cards.Card;
-import com.Viarus.BlackjackGame.Cards.Deck;
+import com.Viarus.BlackjackGame.Game.Cards.Card;
+import com.Viarus.BlackjackGame.Game.Cards.Deck;
 import com.Viarus.BlackjackGame.Game.Croupier.Croupier;
 import com.Viarus.BlackjackGame.Game.Player.Player;
 import com.Viarus.BlackjackGame.Game.PracticeTable.Utils.BotPlayer;
@@ -35,14 +35,12 @@ public class PracticeTable {
     private int countdownTime;
     private String stateMessage;
 
-    //game stats
     int runningValue;
     double trueValue;
     double houseEdge;
     int totalCards;
     int playerValue, botValue, croupierValue;
 
-    //TODO: Add loading from properties (might be possible to do it in a constructor when creating new table - verify)
     private int learningBalance = 100000;
     private int maxPlayers = 3;
     private int decksCount = 3;
@@ -73,7 +71,7 @@ public class PracticeTable {
     public void setTrueValueAndHouseEdge(double trueValue) {
         this.trueValue = trueValue;
         double houseEdge = BASE_HOUSE_EDGE - (trueValue * IMPACT_PER_TRUE_VALUE);
-        this.houseEdge = Math.min(Math.max(houseEdge, -0.03), 0.03) * 100; //Caps at 3% favoring the player or the house
+        this.houseEdge = Math.min(Math.max(houseEdge, -0.03), 0.03) * 100;
     }
 
     @Override

@@ -67,7 +67,6 @@
     </div>
 
     <!--                            ONLINE TABLE                          -->
-
     <div id="onlineTableContainer" class="tableContainer">
       <div id="onlinePlayer1FieldContainer">
         <div id="onlinePlayer1Name">Empty</div>
@@ -218,7 +217,8 @@
         </div>
         <div id="botDecisionsContainer">
           <span id="botDecisionsTitle">Decisions:</span>
-          <div v-if="this.practiceTable.botPlayer.lastDecisions && this.practiceTable.botPlayer.lastDecisions.length > 0">
+          <div
+              v-if="this.practiceTable.botPlayer.lastDecisions && this.practiceTable.botPlayer.lastDecisions.length > 0">
             <ul id="botDecisionsList">
               <li v-for="(decision, index) in this.practiceTable.botPlayer.lastDecisions" :key="index">
                 {{ decision }}
@@ -286,14 +286,6 @@ import SockJS from 'sockjs-client';
 import {Client} from '@stomp/stompjs';
 
 export default {
-
-  mounted() {
-    //TODO: Delete vm after debugging
-    window.vm = this;
-    console.log('Vue instance mounted and accessible via window.vm');
-
-    window.addEventListener("beforeunload", this.handleBeforeUnload);
-  },
 
   beforeUnmount() {
     window.removeEventListener("beforeunload", this.handleBeforeUnload);
@@ -416,6 +408,7 @@ export default {
         console.error('Error creating player:', error);
       }
     },
+
     async selectLearnMode() {
       await this.joinPracticeTable();
     },
@@ -442,12 +435,10 @@ export default {
 
     async joinTable(tableId) {
       try {
-        console.log("trying to join a table")
         const response = await fetch(`/api/v1/table/join/${tableId}?playerId=${this.player.id}`, {method: 'PUT'});
         if (response.ok) {
           this.table = await response.json();
           this.connectToSocket(this.table.id)
-          console.log('Joined table:', this.table);
           document.getElementById('joinGameContainer').style.visibility = 'hidden';
           document.getElementById('onlineTableContainer').style.visibility = 'visible';
           this.updateTable();
@@ -463,12 +454,10 @@ export default {
 
     async joinPracticeTable() {
       try {
-        console.log("trying to join a practice table")
         const response = await fetch(`/api/v1/practiceTable/join?playerId=${this.player.id}`, {method: 'PUT'});
         if (response.ok) {
           this.practiceTable = await response.json();
           this.connectToPracticeSocket(this.practiceTable.id)
-          console.log('Joined table:', this.practiceTable);
           this.updatePracticeTable();
           document.getElementById('gameModeMenuContainer').style.visibility = 'hidden';
           document.getElementById('practiceTableContainer').style.visibility = 'visible';
@@ -487,15 +476,12 @@ export default {
 
       this.stompClient = new Client({
         webSocketFactory: () => socket,
-        debug: (str) => console.log(str),
         reconnectDelay: 5000,
         heartbeatIncoming: 2000,
         heartbeatOutgoing: 2000,
       });
 
       this.stompClient.onConnect = () => {
-        console.log("Connected to WebSocket");
-
         this.stompClient.subscribe(`/topic/table/${tableId}`, (response) => {
           this.table = JSON.parse(response.body);
           this.updateTable();
@@ -510,18 +496,14 @@ export default {
 
       this.stompClient = new Client({
         webSocketFactory: () => socket,
-        debug: (str) => console.log(str),
         reconnectDelay: 5000,
         heartbeatIncoming: 2000,
         heartbeatOutgoing: 2000,
       });
 
       this.stompClient.onConnect = () => {
-        console.log("Connected to WebSocket");
-
         this.stompClient.subscribe(`/topic/practiceTable/${tableId}`, (response) => {
           this.practiceTable = JSON.parse(response.body);
-          console.log("Received practice table update: ", this.practiceTable);
           this.updatePracticeTable();
         });
       };
@@ -533,7 +515,6 @@ export default {
       await this.leaveTable();
 
       if (this.stompClient) {
-        console.log("Disconnecting from WebSocket...");
         this.stompClient.deactivate();
         this.stompClient = null;
       }
@@ -541,10 +522,7 @@ export default {
 
     renderPlayerCards(player, containerId) {
       const container = document.getElementById(containerId);
-      console.log(player.hand.cards)
-
       if (container) container.innerHTML = "";
-
       if (player && player.hand && player.hand.cards) {
         player.hand.cards.forEach((card, index) => {
           const cardImg = this.createCardElement(card, index);
@@ -640,10 +618,8 @@ export default {
       let endpointUrl;
 
       if (this.table) {
-        console.log("Leaving table: ", this.table);
         endpointUrl = `/api/v1/table/leave/${this.table.id}`;
       } else {
-        console.log("Leaving practice table: ", this.practiceTable);
         endpointUrl = `/api/v1/practiceTable/leave/${this.practiceTable.id}`;
 
       }
@@ -658,8 +634,7 @@ export default {
         });
 
         if (response.ok) {
-          const updatedTable = await response.json();
-          console.log("Successfully left the table:", updatedTable);
+          await response.json();
         } else if (response.status === 400) {
           const errorMessage = await response.text();
           console.error("Failed to leave table:", errorMessage);
@@ -685,11 +660,9 @@ export default {
 
     async placeBet() {
       try {
-        console.log("Placing bet " + this.playerBetCount)
         const response = await fetch(`/api/v1/table/bet/${this.table.id}?playerId=${this.player.id}&amount=${this.playerBetCount}`, {method: 'PUT'});
         if (response.ok) {
           this.table = await response.json();
-          console.log(this.table);
           this.playerBetCount = 0;
         } else {
           const info = await response.text();
@@ -703,11 +676,9 @@ export default {
 
     async placePracticeBet() {
       try {
-        console.log("Placing bet " + this.playerBetCount)
         const response = await fetch(`/api/v1/practiceTable/bet/${this.practiceTable.id}?playerId=${this.player.id}&amount=${this.playerBetCount}`, {method: 'PUT'});
         if (response.ok) {
           this.practiceTable = await response.json();
-          console.log(this.practiceTable);
           this.playerBetCount = 0;
         } else {
           const info = await response.text();
@@ -774,8 +745,6 @@ export default {
     },
 
     updateTimerField() {
-      console.log("Updating timer field... table:", this.table);
-      console.log("time: ", this.table.countdownTime);
       const countdownTime = this.table?.countdownTime || 0;
       const message = this.table.stateMessage;
 
@@ -820,8 +789,6 @@ export default {
     },
 
     updatePracticeTimerField() {
-      console.log("Updating timer field... table:", this.practiceTable);
-      console.log("time: ", this.practiceTable.countdownTime);
       const countdownTime = this.practiceTable?.countdownTime || 0;
       const message = this.practiceTable.stateMessage;
 
@@ -866,7 +833,6 @@ export default {
     },
 
     handleTimerEnd() {
-      console.log("Timer ended!");
       document.getElementById("practiceInfoAndTimerContainer").style.visibility = "hidden";
     },
   },

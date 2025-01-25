@@ -1,6 +1,6 @@
 package com.Viarus.BlackjackGame.Game.Table;
 
-import com.Viarus.BlackjackGame.Cards.Hand;
+import com.Viarus.BlackjackGame.Game.Cards.Hand;
 import com.Viarus.BlackjackGame.Game.Player.Player;
 import com.Viarus.BlackjackGame.Game.Player.PlayerDAO;
 import com.Viarus.BlackjackGame.Game.Player.PlayerService;
@@ -11,7 +11,6 @@ import com.Viarus.BlackjackGame.Game.Table.Utils.GameState;
 import com.Viarus.BlackjackGame.Game.Table.Utils.GameStateManager;
 import com.Viarus.BlackjackGame.config.GameTimingConfig;
 import com.Viarus.BlackjackGame.config.GameplayConfig;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.Objects;
 
 import static com.Viarus.BlackjackGame.Game.Table.Utils.GameState.*;
 
-@Slf4j
 @Service
 public class TableService {
     private final TableDAO tableDAO;
@@ -177,7 +175,6 @@ public class TableService {
         if (table.getGameState() != BETTING) {
             return table;
         } else if (table.getPlayers().stream().filter(Objects::nonNull).noneMatch(player -> player.getBet() > 0)) {
-            System.out.println("No bets placed");
             table.setStateMessage("Waiting for bets");
             table.setCountdownTime(gameTimingConfig.betting);
             gameStateManager.scheduleStateChange(table.getId(), PLAYING, gameTimingConfig.betting);
@@ -329,7 +326,6 @@ public class TableService {
     public Table roundResult(Table table) {
         table.setGameState(ROUND_SUMMARY);
         int croupierValue = table.getCroupier().getHand().value;
-        System.out.printf("Croupier %d\n", croupierValue);
         for (Player player : table.getPlayers().stream().filter(Objects::nonNull).toList()) {
             boolean playerWon = false;
             int playerValue = player.getHand().value;
@@ -337,7 +333,6 @@ public class TableService {
             if ((croupierValue > 21 || (croupierValue < playerValue)) && playerValue <= 21) {
                 playerWon = true;
             }
-            System.out.println(player.getName() + " " + playerValue + " " + (playerWon ? "won" : "lost"));
             if (playerWon) {
                 int playerWinnings;
                 if (playerBlackJack) {

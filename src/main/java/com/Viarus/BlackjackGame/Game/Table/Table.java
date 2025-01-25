@@ -1,6 +1,6 @@
 package com.Viarus.BlackjackGame.Game.Table;
 
-import com.Viarus.BlackjackGame.Cards.Deck;
+import com.Viarus.BlackjackGame.Game.Cards.Deck;
 import com.Viarus.BlackjackGame.Game.Croupier.Croupier;
 import com.Viarus.BlackjackGame.Game.Player.Player;
 import com.Viarus.BlackjackGame.Game.Table.Utils.GameState;
@@ -29,7 +29,6 @@ public class Table {
     private int countdownTime;
     private String stateMessage;
 
-    //TODO: Add loading from properties
     private int maxPlayers = 3;
     private int decksCount = 3;
     private int blackJackMultiplier = 3;

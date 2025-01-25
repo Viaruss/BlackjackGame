@@ -12,7 +12,6 @@
   font-style: normal;
 }
 
-/* base styling */
 * {
   margin: 0;
   padding: 0;
@@ -30,15 +29,15 @@ body, html {
 }
 
 .popUpContainer {
-  position: absolute; /* Take the container out of the document flow */
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center the container both vertically and horizontally */
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 85%; /* Set an appropriate width */
+  width: 85%;
   padding: 20px;
   color: @light1;
   border: 10px solid @accent;
@@ -61,7 +60,6 @@ body, html {
   border-radius: 8px;
 }
 
-/* Hover effect for interactivity (only changes size and shadow) */
 .button:hover,
 .coinButton:hover,
 .joinGameTableListElement:hover {
@@ -69,7 +67,6 @@ body, html {
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Active state (pressed effect) */
 .button:active,
 .coinButton:active,
 .joinGameTableListElement:active {
@@ -77,7 +74,6 @@ body, html {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* debug */
 .contentContainer {
   display: flex;
   flex-direction: row;
@@ -418,7 +414,6 @@ body, html {
   position: relative;
 }
 
-/* Bets Panel within Controls Container */
 #onlinePlayer2BetsPanelContainer,
 #localPlayerBetsPanelContainer {
   width: 100%;
@@ -449,7 +444,6 @@ body, html {
   padding-bottom: 15px;
 }
 
-/* Common Styles for all Buttons */
 .coinButton {
   width: 70px;
   height: 70px;
@@ -467,7 +461,6 @@ body, html {
   z-index: 1;
 }
 
-/* Specific Colors for Each Button */
 .coinButton1 {
   background-color: black;
 }
@@ -488,7 +481,6 @@ body, html {
   background-color: darkviolet;
 }
 
-/* Border patterns for each button */
 .coinButton1::before,
 .coinButton2::before,
 .coinButton3::before,
@@ -529,7 +521,6 @@ body, html {
   z-index: -1;
 }
 
-/* Inner circle for all buttons */
 .coinButton1::after,
 .coinButton2::after,
 .coinButton3::after,
@@ -547,14 +538,13 @@ body, html {
 }
 
 #betsControlPlaceButton {
-  width: 70px; /* Diameter of the chip */
-  height: 70px; /* Diameter of the chip */
+  width: 70px;
+  height: 70px;
   font-weight: bold;
-  font-size: 16px; /* Text size */
+  font-size: 16px;
   cursor: pointer;
 }
 
-/* Actions Panel within Controls Container */
 #onlinePlayer2ActionsPanelContainer,
 #localPlayerActionsPanelContainer {
   width: 100%;
@@ -565,7 +555,6 @@ body, html {
   position: absolute;
 }
 
-//practice table styling
 #practiceTableContainer {
   display: grid;
   grid-template-areas:

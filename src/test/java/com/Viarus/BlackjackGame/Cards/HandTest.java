@@ -1,9 +1,10 @@
 package com.Viarus.BlackjackGame.Cards;
 
+import com.Viarus.BlackjackGame.Game.Cards.Card;
+import com.Viarus.BlackjackGame.Game.Cards.Hand;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class HandTest {

@@ -1,8 +1,8 @@
 package com.Viarus.BlackjackGame.Game.Croupier;
 
 
-import com.Viarus.BlackjackGame.Cards.Card;
-import com.Viarus.BlackjackGame.Cards.Hand;
+import com.Viarus.BlackjackGame.Game.Cards.Card;
+import com.Viarus.BlackjackGame.Game.Cards.Hand;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +13,6 @@ public class Croupier {
     private int totalWinnings;
     private int totalLosings;
 
-    //TODO: Load this value from properties
-    //@Value("${game.settings.croupier.maxHitValue}")
     private int maxHitValue;
 
     public Croupier() {

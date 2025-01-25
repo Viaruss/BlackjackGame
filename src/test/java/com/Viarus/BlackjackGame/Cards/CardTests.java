@@ -1,5 +1,6 @@
 package com.Viarus.BlackjackGame.Cards;
 
+import com.Viarus.BlackjackGame.Game.Cards.Card;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;

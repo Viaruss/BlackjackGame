@@ -1,18 +1,18 @@
 package com.Viarus.BlackjackGame.Game.PracticeTable.Utils;
 
-import com.Viarus.BlackjackGame.Cards.Card;
-import com.Viarus.BlackjackGame.Cards.Hand;
+import com.Viarus.BlackjackGame.Game.Cards.Card;
+import com.Viarus.BlackjackGame.Game.Cards.Hand;
 
 public class BotStrategy {
 
     public static int calculateBet(double trueValue) {
-        int bet = 100; //Base bet
+        int bet = 100;
         if (trueValue > 0) {
-            bet += (int) (trueValue * bet); // Increase bet proportionally to the true count
+            bet += (int) (trueValue * bet);
         } else if (trueValue < 0) {
-            bet = bet / 2; // Minimum bet is half the base bet
+            bet = 25;
         }
-        return bet - (bet % 5); //scale bet to be a multiplication of 5
+        return bet - (bet % 5);
     }
 
     public enum Decision {
@@ -25,7 +25,6 @@ public class BotStrategy {
 
         int croupierValue = Math.min(croupierCard.value, 10);
 
-        // Basic strategy logic
         if (playerValue >= 17) {
             return Decision.STAND;
         }

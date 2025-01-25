@@ -8,7 +8,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
@@ -22,6 +21,5 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.setApplicationDestinationPrefixes("/app");
         config.enableSimpleBroker("/topic/table", "/topic/practiceTable");
-
     }
 }

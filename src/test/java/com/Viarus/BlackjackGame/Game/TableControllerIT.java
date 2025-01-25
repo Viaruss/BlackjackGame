@@ -29,7 +29,7 @@ public class TableControllerIT {
     private MockMvc mockMvc;
 
     @MockBean
-    private TableService tableService; // Mocked service
+    private TableService tableService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -40,7 +40,6 @@ public class TableControllerIT {
 
     @BeforeEach
     public void setUp() throws Exception {
-        // Mock service behavior with pre-prepared JSON response
         Table table = objectMapper.readValue(loadJson("src/test/resources/getTableResponse.json"), Table.class);
         Mockito.when(tableService.getAllTables()).thenReturn(List.of(table));
     }
@@ -51,7 +50,6 @@ public class TableControllerIT {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Verify the content matches your expected response (in JSON format)
         String expectedResponse = loadJson("src/test/resources/getTableResponse.json");
         assertEquals(expectedResponse, result.getResponse().getContentAsString());
     }

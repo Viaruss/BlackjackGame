@@ -4,7 +4,6 @@
   font-weight: normal;
   font-style: normal;
 }
-/* base styling */
 * {
   margin: 0;
   padding: 0;
@@ -22,17 +21,14 @@ html {
 }
 .popUpContainer {
   position: absolute;
-  /* Take the container out of the document flow */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* Center the container both vertically and horizontally */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 85%;
-  /* Set an appropriate width */
   padding: 20px;
   color: #e5e5e5;
   border: 10px solid #cca43b;
@@ -53,21 +49,18 @@ html {
   width: 20%;
   border-radius: 8px;
 }
-/* Hover effect for interactivity (only changes size and shadow) */
 .button:hover,
 .coinButton:hover,
 .joinGameTableListElement:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }
-/* Active state (pressed effect) */
 .button:active,
 .coinButton:active,
 .joinGameTableListElement:active {
   transform: scale(1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
-/* debug */
 .contentContainer {
   display: flex;
   flex-direction: row;
@@ -364,7 +357,6 @@ html {
   align-items: center;
   position: relative;
 }
-/* Bets Panel within Controls Container */
 #onlinePlayer2BetsPanelContainer,
 #localPlayerBetsPanelContainer {
   width: 100%;
@@ -392,7 +384,6 @@ html {
   gap: 10px;
   padding-bottom: 15px;
 }
-/* Common Styles for all Buttons */
 .coinButton {
   width: 70px;
   height: 70px;
@@ -409,7 +400,6 @@ html {
   background: radial-gradient(circle, #ffffff 50%, transparent 100%);
   z-index: 1;
 }
-/* Specific Colors for Each Button */
 .coinButton1 {
   background-color: black;
 }
@@ -425,7 +415,6 @@ html {
 .coinButton5 {
   background-color: darkviolet;
 }
-/* Border patterns for each button */
 .coinButton1::before,
 .coinButton2::before,
 .coinButton3::before,
@@ -441,7 +430,6 @@ html {
   background: conic-gradient(#ffffff 0deg, transparent 15deg, #ffffff 30deg, transparent 45deg, #ffffff 60deg, transparent 75deg, #ffffff 90deg, transparent 105deg, #ffffff 120deg, transparent 135deg, #ffffff 150deg, transparent 165deg, #ffffff 180deg, transparent 195deg, #ffffff 210deg, transparent 225deg, #ffffff 240deg, transparent 255deg, #ffffff 270deg, transparent 285deg, #ffffff 300deg, transparent 315deg, #ffffff 330deg, transparent 345deg, #ffffff 360deg);
   z-index: -1;
 }
-/* Inner circle for all buttons */
 .coinButton1::after,
 .coinButton2::after,
 .coinButton3::after,
@@ -459,15 +447,11 @@ html {
 }
 #betsControlPlaceButton {
   width: 70px;
-  /* Diameter of the chip */
   height: 70px;
-  /* Diameter of the chip */
   font-weight: bold;
   font-size: 16px;
-  /* Text size */
   cursor: pointer;
 }
-/* Actions Panel within Controls Container */
 #onlinePlayer2ActionsPanelContainer,
 #localPlayerActionsPanelContainer {
   width: 100%;

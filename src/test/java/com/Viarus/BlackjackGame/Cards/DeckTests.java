@@ -1,10 +1,11 @@
 package com.Viarus.BlackjackGame.Cards;
 
+import com.Viarus.BlackjackGame.Game.Cards.Deck;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeckTests {
@@ -31,6 +32,6 @@ public class DeckTests {
 
         //Then
         assertTrue(SUT.getCards().containsAll(notShuffledDeck.getCards()));
-        assertFalse(SUT.getCards().equals(notShuffledDeck.getCards()));
+        assertNotEquals(SUT.getCards(), notShuffledDeck.getCards());
     }
 }

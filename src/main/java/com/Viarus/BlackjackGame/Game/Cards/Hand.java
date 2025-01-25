@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Cards;
+package com.Viarus.BlackjackGame.Game.Cards;
 
 import java.util.ArrayList;
 import java.util.List;

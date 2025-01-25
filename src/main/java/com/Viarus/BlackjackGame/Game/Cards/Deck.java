@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Cards;
+package com.Viarus.BlackjackGame.Game.Cards;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,6 @@ public class Deck {
     private int cardsDealt;
 
     public Deck(){
-        //Default deck
         this.cards = new ArrayList<>();
         String[] ranks = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
         String[] suits = {"C", "D", "H", "S"};
@@ -29,7 +28,6 @@ public class Deck {
     }
 
     public Deck(int count){
-        //Multi-deck deck of cards
         this.cards = new ArrayList<>();
         String[] ranks = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
         String[] suits = {"C", "D", "H", "S"};

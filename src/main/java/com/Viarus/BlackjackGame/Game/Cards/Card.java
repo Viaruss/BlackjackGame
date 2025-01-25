@@ -1,4 +1,4 @@
-package com.Viarus.BlackjackGame.Cards;
+package com.Viarus.BlackjackGame.Game.Cards;
 
 import com.sun.jdi.InternalException;
 import lombok.Getter;
