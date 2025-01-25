@@ -151,7 +151,7 @@ public class TableService {
         table.setGameState(WAITING_FOR_PLAYERS);
         clearCards(table);
         table.setStateMessage("Waiting for players");
-        table.setCountdownTime(gameTimingConfig.postGameWaiting);
+        table.setCountdownTime(gameTimingConfig.initialWaiting);
         gameStateManager.scheduleStateChange(table.getId(), BETTING, gameTimingConfig.initialWaiting);
         return table;
     }
@@ -164,6 +164,7 @@ public class TableService {
             List<Player> currentPlayers = table.getPlayers().stream().filter(Objects::nonNull).toList();
             for (Player player : currentPlayers) {
                 player.setCurrentAction(PlayerActions.BETTING);
+                player.setLastRoundResult(null);
                 table.updatePlayer(player);
                 playerService.save(player);
             }
@@ -246,7 +247,7 @@ public class TableService {
         table.setGameState(GameState.CROUPIER_TURN);
 
         table.getCroupier().showCards();
-        while (table.getCroupier().getHand().value < gameplayConfig.getCroupierLimit()) {
+        while (table.getCroupier().getHand().value < table.getCroupier().getMaxHitValue()) {
             table.getCroupier().getHand().addCard(table.getCardsInPlay().dealCard());
         }
         table.setStateMessage("Waiting for summary");
@@ -327,6 +328,9 @@ public class TableService {
         table.setGameState(ROUND_SUMMARY);
         int croupierValue = table.getCroupier().getHand().value;
         for (Player player : table.getPlayers().stream().filter(Objects::nonNull).toList()) {
+            if (player.getBet() == 0) {
+                continue;
+            }
             boolean playerWon = false;
             int playerValue = player.getHand().value;
             boolean playerBlackJack = (playerValue == 21 && player.getHand().cards.size() == 2);

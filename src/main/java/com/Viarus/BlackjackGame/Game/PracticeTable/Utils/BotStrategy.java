@@ -8,9 +8,9 @@ public class BotStrategy {
     public static int calculateBet(double trueValue) {
         int bet = 100;
         if (trueValue > 0) {
-            bet += (int) (trueValue * bet);
+            bet += (int) Math.min(0.4 * trueValue * bet, 200);
         } else if (trueValue < 0) {
-            bet = 25;
+            bet += (int) Math.max(0.4 * trueValue * bet, -60);
         }
         return bet - (bet % 5);
     }
