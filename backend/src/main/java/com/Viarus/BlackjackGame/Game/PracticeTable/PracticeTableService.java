@@ -208,7 +208,7 @@ public class PracticeTableService {
         table.getCroupier().showCards();
 
         ArrayList<Card> dealtCards = new ArrayList<>();
-        while (table.getCroupier().getHand().value < gameplayConfig.getCroupierLimit()) {
+        while (table.getCroupier().getHand().value < table.getCroupier().getMaxHitValue()) {
             Card card = table.getCardsInPlay().dealCard();
             table.getCroupier().getHand().addCard(card);
             dealtCards.add(card);

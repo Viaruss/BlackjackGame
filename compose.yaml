@@ -1,9 +1,42 @@
+version: '3.8'
+
 services:
   mongodb:
     image: 'mongo:latest'
+    container_name: blackjack-mongodb
     environment:
-      - 'MONGO_INITDB_DATABASE=BlackJackDatabase'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
+      - MONGO_INITDB_DATABASE=BlackJackDatabase
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
     ports:
-      - '27017:27017'
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: blackjack-backend
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://root:secret@mongodb:27017/BlackJackDatabase?authSource=admin
+    depends_on:
+      - mongodb
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: blackjack-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+volumes:
+  db_data:
